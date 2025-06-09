@@ -52,12 +52,39 @@ def calculate_stacked_household_impacts(reforms, baseline_reform, year):
 
     married = married > 0
     
+    # Get person-level values
+    age = baseline.calculate("age", map_to="person", period=year).values
+    person_household = baseline.calculate("household_id", map_to="person", period=year).values
+    is_head = baseline.calculate("is_tax_unit_head", map_to="person", period=year).values
+    is_spouse = baseline.calculate("is_tax_unit_spouse", map_to="person", period=year).values
+
+    # Create arrays to store household-level ages (same length as household arrays)
+    age_head = np.zeros(len(household_id))
+    age_spouse = np.zeros(len(household_id))
+
+    # Map person ages to household level
+    for i, hh_id in enumerate(household_id):
+        # Find all persons in this household
+        household_mask = person_household == hh_id
+        
+        # Get head's age
+        head_mask = household_mask & is_head
+        if np.any(head_mask):
+            age_head[i] = age[head_mask][0]
+        
+        # Get spouse's age (if married)
+        if married[i]:
+            spouse_mask = household_mask & is_spouse
+            if np.any(spouse_mask):
+                age_spouse[i] = age[spouse_mask][0]
 
     
     # Initialize results dictionary
     results = {
         'Household ID': household_id,
         'State': state,
+        'Age of Head': age_head,
+        'Age of Spouse': age_spouse,
         'Number of Dependents': num_dependents,
         'Is Married': married,
         'Employment Income': employment_income,
