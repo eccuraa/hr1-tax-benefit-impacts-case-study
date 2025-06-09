@@ -57,34 +57,53 @@ def calculate_stacked_household_impacts(reforms, baseline_reform, year):
     person_household = baseline.calculate("household_id", map_to="person", period=year).values
     is_head = baseline.calculate("is_tax_unit_head", map_to="person", period=year).values
     is_spouse = baseline.calculate("is_tax_unit_spouse", map_to="person", period=year).values
+    is_dependent = baseline.calculate("is_tax_unit_dependent", map_to="person", period=year).values
 
-    # Create arrays to store household-level ages (same length as household arrays)
-    age_head = np.zeros(len(household_id))
-    age_spouse = np.zeros(len(household_id))
 
-    # Map person ages to household level
-    for i, hh_id in enumerate(household_id):
-        # Find all persons in this household
-        household_mask = person_household == hh_id
+    # Create a DataFrame with person-level data
+    person_df = pd.DataFrame({
+        'household_id': person_household,
+        'age': age,
+        'is_dependent': is_dependent,
+        'is_head': is_head,
+        'is_spouse': is_spouse
+    })
+
+    # Get head ages
+    head_ages = person_df[person_df['is_head']].groupby('household_id')['age'].first()
+    age_head = head_ages.reindex(household_id).fillna(0).values
+
+    # Get spouse ages
+    spouse_ages = person_df[person_df['is_spouse']].groupby('household_id')['age'].first()
+    age_spouse = spouse_ages.reindex(household_id).fillna(0).values
+
+    # Get dependent ages - create separate columns
+    # First, get all dependents and add a rank within each household
+    dependents_df = person_df[person_df['is_dependent']].copy()
+    dependents_df['dep_rank'] = dependents_df.groupby('household_id')['age'].rank(method='first')
+
+    # Determine max number of dependents
+    max_dependents = int(num_dependents.max()) if num_dependents.max() > 0 else 0
+
+    # Create a dictionary to hold dependent age columns
+    dependent_age_columns = {}
+
+    # Create each dependent age column
+    for i in range(max_dependents):
+        # Get the i-th dependent for each household
+        ith_dependent = dependents_df[dependents_df['dep_rank'] == i + 1].groupby('household_id')['age'].first()
         
-        # Get head's age
-        head_mask = household_mask & is_head
-        if np.any(head_mask):
-            age_head[i] = age[head_mask][0]
-        
-        # Get spouse's age (if married)
-        if married[i]:
-            spouse_mask = household_mask & is_spouse
-            if np.any(spouse_mask):
-                age_spouse[i] = age[spouse_mask][0]
+        # Reindex to match household_id order and fill missing with NaN
+        dependent_age_columns[f'Age of Dependent {i+1}'] = ith_dependent.reindex(household_id).values
 
-    
+
     # Initialize results dictionary
     results = {
         'Household ID': household_id,
         'State': state,
         'Age of Head': age_head,
         'Age of Spouse': age_spouse,
+        **dependent_age_columns,  # Add here
         'Number of Dependents': num_dependents,
         'Is Married': married,
         'Employment Income': employment_income,
@@ -98,7 +117,7 @@ def calculate_stacked_household_impacts(reforms, baseline_reform, year):
         'Baseline Net Income': baseline_net_income,
         'Household Weight': household_weight,
     }
-    
+
     # Track cumulative values
     cumulative_reform = None
     previous_income_tax = baseline_income_tax.copy()
