@@ -37,6 +37,7 @@ def calculate_stacked_household_impacts(reforms, baseline_reform, year):
     baseline_net_income = baseline.calculate("household_net_income", map_to="household", period=year).values
 
     # Get household-level characteristics
+    household_id = baseline.calculate("household_id", map_to="household", period=year).values
     state = baseline.calculate("state_code", map_to="household", period=year).values
     num_dependents = baseline.calculate("tax_unit_dependents", map_to="household", period=year).values
     married = baseline.calculate("is_married", map_to="household", period=year).values
@@ -55,6 +56,7 @@ def calculate_stacked_household_impacts(reforms, baseline_reform, year):
     
     # Initialize results dictionary
     results = {
+        'Household ID': household_id,
         'State': state,
         'Number of Dependents': num_dependents,
         'Is Married': married,
