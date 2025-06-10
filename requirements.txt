@@ -3,3 +3,4 @@ policyengine-us
 pandas
 numpy
 pyyaml
+streamlit
