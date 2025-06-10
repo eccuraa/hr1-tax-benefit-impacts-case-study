@@ -51,35 +51,34 @@ def main():
     
     # Get household data
     household = df[df['Household ID'] == household_id].iloc[0]
+
+    # Baseline Attributes in Sidebar
+    st.sidebar.subheader("📊 Baseline Household Attributes")
+    st.sidebar.markdown(f"""
+    **Household ID:** {household['Household ID']}  
+    **State:** {household['State']}  
+    **Head of Household Age:** {household['Age of Head']:.0f} years  
+    **Spouse Age:** {household['Age of Spouse']:.0f} years (if married)  
+    **Number of Dependents:** {household['Number of Dependents']:.0f}  
+    **Marital Status:** {'Married' if household['Is Married'] else 'Single'}  
+    """)
+
+    st.sidebar.markdown("**Income Sources:**")
+    income_sources = [
+        ("Employment Income", household['Employment Income']),
+        ("Self-Employment Income", household['Self-Employment Income']),
+        ("Tip Income", household['Tip Income']),
+        ("Overtime Income", household['Overtime Income'])
+    ]
+
+    for source, amount in income_sources:
+        if amount > 0:
+            st.sidebar.markdown(f"• {source}: ${amount:,.2f}")
     
     # Display household information in cards
     col1, col2 = st.columns(2)
     
     with col1:
-        # Baseline Attributes Card
-        st.subheader("📊 Household Attributes")
-        with st.container():
-            st.markdown(f"""
-            **Household ID:** {household['Household ID']}  
-            **State:** {household['State']}  
-            **Head of Household Age:** {household['Age of Head']:.0f} years  
-            **Spouse Age:** {household['Age of Spouse']:.0f} years (if married)  
-            **Number of Dependents:** {household['Number of Dependents']:.0f}  
-            **Marital Status:** {'Married' if household['Is Married'] else 'Single'}  
-            """)
-            
-            st.markdown("**Income Sources:**")
-            income_sources = [
-                ("Employment Income", household['Employment Income']),
-                ("Self-Employment Income", household['Self-Employment Income']),
-                ("Tip Income", household['Tip Income']),
-                ("Overtime Income", household['Overtime Income'])
-            ]
-            
-            for source, amount in income_sources:
-                if amount > 0:
-                    st.markdown(f"• {source}: ${amount:,.2f}")
-        
         # Baseline Calculated Values Card
         st.subheader("💰 Baseline Federal Tax and Net Income")
         with st.container():
