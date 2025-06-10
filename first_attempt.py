@@ -12,7 +12,7 @@ st.set_page_config(
 # Load data
 @st.cache_data
 def load_data():
-    return pd.read_csv("Household Tax Income Changes.csv")
+    return pd.read_csv("household_tax_income_changes.csv")
 
 # Main app
 def main():
