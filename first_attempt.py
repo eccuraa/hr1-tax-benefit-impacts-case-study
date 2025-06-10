@@ -17,7 +17,7 @@ def load_data():
 # Main app
 def main():
     st.title("🏠 HR1 Tax Bill - Household Impact Dashboard")
-    st.markdown("*Explore how the HR1 tax bill affects individual American households*")
+    st.markdown("*Explore how the HR1 tax bill affects individual American households compared to current policy*")
     
     # Load the data
     df = load_data()
@@ -57,7 +57,7 @@ def main():
     
     with col1:
         # Baseline Attributes Card
-        st.subheader("📊 Baseline Household Attributes")
+        st.subheader("📊 Household Attributes")
         with st.container():
             st.markdown(f"""
             **Household ID:** {household['Household ID']}  
@@ -81,7 +81,7 @@ def main():
                     st.markdown(f"• {source}: ${amount:,.2f}")
         
         # Baseline Calculated Values Card
-        st.subheader("💰 Current Tax Situation")
+        st.subheader("💰 Baseline Federal Tax and Net Income")
         with st.container():
             st.metric(
                 "Federal Tax Liability", 
@@ -160,7 +160,7 @@ def main():
                 <div style="padding: 8px; border-radius: 5px; background-color: #f9f9f9; margin: 5px 0;">
                 <h5>{name}</h5>
                 <p style="color: {color}; font-weight: bold;">
-                Income Change: ${income_change:,.2f}
+                Net Income Change: ${income_change:,.2f} 
                 </p>
                 </div>
                 """, unsafe_allow_html=True)
