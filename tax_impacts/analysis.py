@@ -123,6 +123,7 @@ def calculate_stacked_household_impacts(reforms, baseline_reform, year):
     # Track cumulative values
     cumulative_reform = None
     previous_income_tax = baseline_income_tax.copy()
+    previous_state_income_tax = state_income_tax.copy()
     previous_net_income = baseline_net_income.copy()
     
     # Apply each reform sequentially
@@ -140,22 +141,27 @@ def calculate_stacked_household_impacts(reforms, baseline_reform, year):
         
         # Get reformed values
         reformed_income_tax = reformed.calculate("income_tax", map_to="household", period=year).values
+        reformed_state_income_tax = reformed.calculate("state_income_tax", map_to="household", period=year).values
         reformed_net_income = reformed.calculate("household_net_income", map_to="household", period=year).values
         
         # Calculate incremental changes (from previous state)
         tax_change = reformed_income_tax - previous_income_tax
+        state_tax_change = reformed_state_income_tax - previous_state_income_tax
         net_income_change = reformed_net_income - previous_net_income
         
         # Store results
         results[f'Federal tax liability after {reform_name}'] = tax_change
+        results[f'State tax liability after {reform_name}'] = state_tax_change
         results[f'Net income change after {reform_name}'] = net_income_change
         
         # Update previous values for next iteration
         previous_income_tax = reformed_income_tax.copy()
+        previous_state_income_tax = reformed_state_income_tax.copy()
         previous_net_income = reformed_net_income.copy()
     
     # Add final total changes (from baseline to fully reformed)
     results[f'Total Change in Federal Tax Liability'] = previous_income_tax - baseline_income_tax
+    results[f'Total Change in State Tax Liability'] = previous_state_income_tax - state_income_tax
     results[f'Total Change in Net Income'] = previous_net_income - baseline_net_income
     
     # Calculate percentage changes
@@ -172,6 +178,13 @@ def calculate_stacked_household_impacts(reforms, baseline_reform, year):
     results[f'Percentage Change in Federal Tax Liability'] = pct_tax_change
     results[f'Percentage Change in Net Income'] = pct_net_income_change
     
+    # Calculate percentage changes for state tax
+    pct_state_tax_change = np.zeros_like(state_income_tax)
+    mask = state_income_tax != 0
+    pct_state_tax_change[mask] = (results[f'Total Change in State Tax Liability'][mask] / state_income_tax[mask]) * 100
+    
+    results[f'Percentage Change in State Tax Liability'] = pct_state_tax_change
+
     # Create DataFrame
     df = pd.DataFrame(results)
     
