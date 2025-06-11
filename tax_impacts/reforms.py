@@ -24,32 +24,32 @@ def tcja_reform():
                 "2026-01-01.2026-12-31": 139850,
             },
             "gov.irs.income.bracket.thresholds.3.JOINT": {
-                "2026-01-01.2026-12-31": 210950,
+                "2026-01-01.2026-12-31": 208300,
             },
             "gov.irs.income.bracket.thresholds.4.JOINT": {
-                "2026-01-01.2026-12-31": 402725,
+                "2026-01-01.2026-12-31": 397650,
             },
             "gov.irs.income.bracket.thresholds.5.JOINT": {
-                "2026-01-01.2026-12-31": 511400,
+                "2026-01-01.2026-12-31": 512950,
             },
             "gov.irs.income.bracket.thresholds.6.JOINT": {
-                "2026-01-01.2026-12-31": 767125,
+                "2026-01-01.2026-12-31": 769450,
             },
             "gov.irs.credits.ctc.amount.adult_dependent": {"2026-01-01.2100-12-31": 500},
             "gov.irs.income.amt.exemption.amount.SINGLE": {
                 "2026-01-01.2026-12-31": 89925,
             },
             "gov.irs.income.bracket.thresholds.3.SINGLE": {
-                "2026-01-01.2026-12-31": 105475,
+                "2026-01-01.2026-12-31": 104900,
             },
             "gov.irs.income.bracket.thresholds.4.SINGLE": {
-                "2026-01-01.2026-12-31": 201350,
+                "2026-01-01.2026-12-31": 198800,
             },
             "gov.irs.income.bracket.thresholds.5.SINGLE": {
-                "2026-01-01.2026-12-31": 255700,
+                "2026-01-01.2026-12-31": 256450,
             },
             "gov.irs.income.bracket.thresholds.6.SINGLE": {
-                "2026-01-01.2026-12-31": 639300,
+                "2026-01-01.2026-12-31": 641200,
             },
             "gov.irs.deductions.itemized.casualty.active": {"2026-01-01.2100-12-31": False},
             "gov.irs.deductions.standard.amount.SEPARATE": {
@@ -63,16 +63,16 @@ def tcja_reform():
                 "2026-01-01.2026-12-31": 69925,
             },
             "gov.irs.income.bracket.thresholds.3.SEPARATE": {
-                "2026-01-01.2026-12-31": 105475,
+                "2026-01-01.2026-12-31": 104900,
             },
             "gov.irs.income.bracket.thresholds.4.SEPARATE": {
-                "2026-01-01.2026-12-31": 201350,
+                "2026-01-01.2026-12-31": 198800,
             },
             "gov.irs.income.bracket.thresholds.5.SEPARATE": {
-                "2026-01-01.2026-12-31": 255700,
+                "2026-01-01.2026-12-31": 256450,
             },
             "gov.irs.income.bracket.thresholds.6.SEPARATE": {
-                "2026-01-01.2026-12-31": 383550,
+                "2026-01-01.2026-12-31": 384700,
             },
             "gov.irs.credits.ctc.phase_out.threshold.JOINT": {
                 "2026-01-01.2100-12-31": 400000
@@ -129,16 +129,16 @@ def tcja_reform():
                 "2026-01-01.2026-12-31": 139850,
             },
             "gov.irs.income.bracket.thresholds.3.SURVIVING_SPOUSE": {
-                "2026-01-01.2026-12-31": 210950,
+                "2026-01-01.2026-12-31": 208300,
             },
             "gov.irs.income.bracket.thresholds.4.SURVIVING_SPOUSE": {
-                "2026-01-01.2026-12-31": 402725,
+                "2026-01-01.2026-12-31": 397650,
             },
             "gov.irs.income.bracket.thresholds.5.SURVIVING_SPOUSE": {
-                "2026-01-01.2026-12-31": 511400,
+                "2026-01-01.2026-12-31": 512950,
             },
             "gov.irs.income.bracket.thresholds.6.SURVIVING_SPOUSE": {
-                "2026-01-01.2026-12-31": 767125,
+                "2026-01-01.2026-12-31": 769450,
             },
             "gov.irs.income.amt.exemption.amount.HEAD_OF_HOUSEHOLD": {
                 "2026-01-01.2026-12-31": 89925,
@@ -147,16 +147,16 @@ def tcja_reform():
                 "2026-01-01.2026-12-31": 639300,
             },
             "gov.irs.income.bracket.thresholds.3.HEAD_OF_HOUSEHOLD": {
-                "2026-01-01.2026-12-31": 105475,
+                "2026-01-01.2026-12-31": 104900,
             },
             "gov.irs.income.bracket.thresholds.4.HEAD_OF_HOUSEHOLD": {
-                "2026-01-01.2026-12-31": 201350,
+                "2026-01-01.2026-12-31": 198800,
             },
             "gov.irs.income.bracket.thresholds.5.HEAD_OF_HOUSEHOLD": {
-                "2026-01-01.2026-12-31": 255700,
+                "2026-01-01.2026-12-31": 256486,
             },
             "gov.irs.income.bracket.thresholds.6.HEAD_OF_HOUSEHOLD": {
-                "2026-01-01.2026-12-31": 639300,
+                "2026-01-01.2026-12-31": 641200,
             },
             "gov.irs.deductions.qbi.phase_out.start.SURVIVING_SPOUSE": {
                 "2026-01-01.2026-12-31": 409800,
@@ -238,64 +238,64 @@ def hr1_tax_rate_reform():
         "2026-01-01.2100-12-31": 0.37
     },
     "gov.irs.income.bracket.thresholds.3.HEAD_OF_HOUSEHOLD": {
-        "2026-01-01.2026-12-31": 105475,
+        "2026-01-01.2026-12-31": 104900,
     },
     "gov.irs.income.bracket.thresholds.4.HEAD_OF_HOUSEHOLD": {
-        "2026-01-01.2026-12-31": 201350,
+        "2026-01-01.2026-12-31": 198800,
     },
     "gov.irs.income.bracket.thresholds.5.HEAD_OF_HOUSEHOLD": {
-        "2026-01-01.2026-12-31": 255700,
+        "2026-01-01.2026-12-31": 256486,
     },
     "gov.irs.income.bracket.thresholds.6.HEAD_OF_HOUSEHOLD": {
-        "2026-01-01.2026-12-31": 639300,
+        "2026-01-01.2026-12-31": 643950,
     },
     "gov.irs.income.bracket.thresholds.3.JOINT": {
-        "2026-01-01.2026-12-31": 210950,
+        "2026-01-01.2026-12-31": 208300,
     },
     "gov.irs.income.bracket.thresholds.4.JOINT": {
-        "2026-01-01.2026-12-31": 402725,
+        "2026-01-01.2026-12-31": 397650,
     },
     "gov.irs.income.bracket.thresholds.5.JOINT": {
-        "2026-01-01.2026-12-31": 511400,
+        "2026-01-01.2026-12-31": 512950,
     },
     "gov.irs.income.bracket.thresholds.6.JOINT": {
-        "2026-01-01.2026-12-31": 767125,
+        "2026-01-01.2026-12-31": 772750,
     },
     "gov.irs.income.bracket.thresholds.3.SEPARATE": {
-        "2026-01-01.2026-12-31": 105475,
+        "2026-01-01.2026-12-31": 104900,
     },
     "gov.irs.income.bracket.thresholds.4.SEPARATE": {
-        "2026-01-01.2026-12-31": 201350,
+        "2026-01-01.2026-12-31": 198800,
     },
     "gov.irs.income.bracket.thresholds.5.SEPARATE": {
-        "2026-01-01.2026-12-31": 255700,
+        "2026-01-01.2026-12-31": 256450,
     },
     "gov.irs.income.bracket.thresholds.6.SEPARATE": {
-        "2026-01-01.2026-12-31": 383550,
+        "2026-01-01.2026-12-31": 386350,
     },
     "gov.irs.income.bracket.thresholds.3.SINGLE": {
         "2026-01-01.2026-12-31": 105475,
     },
     "gov.irs.income.bracket.thresholds.4.SINGLE": {
-        "2026-01-01.2026-12-31": 201350,
+        "2026-01-01.2026-12-31": 198800,
     },
     "gov.irs.income.bracket.thresholds.5.SINGLE": {
-        "2026-01-01.2026-12-31": 255700,
+        "2026-01-01.2026-12-31": 256450,
     },
     "gov.irs.income.bracket.thresholds.6.SINGLE": {
-        "2026-01-01.2026-12-31": 639300,
+        "2026-01-01.2026-12-31": 643950,
     },
     "gov.irs.income.bracket.thresholds.3.SURVIVING_SPOUSE": {
-        "2026-01-01.2026-12-31": 210950,
+        "2026-01-01.2026-12-31": 208300,
     },
     "gov.irs.income.bracket.thresholds.4.SURVIVING_SPOUSE": {
-        "2026-01-01.2026-12-31": 402725,
+        "2026-01-01.2026-12-31": 397650,
     },
     "gov.irs.income.bracket.thresholds.5.SURVIVING_SPOUSE": {
-        "2026-01-01.2026-12-31": 511400,
+        "2026-01-01.2026-12-31": 512950,
     },
     "gov.irs.income.bracket.thresholds.6.SURVIVING_SPOUSE": {
-        "2026-01-01.2026-12-31": 767125,
+        "2026-01-01.2026-12-31": 772750,
     },
     }, country_id="us")
 

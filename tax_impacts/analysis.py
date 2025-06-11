@@ -121,7 +121,7 @@ def calculate_stacked_household_impacts(reforms, baseline_reform, year):
     }
 
     # Track cumulative values
-    cumulative_reform = None
+    cumulative_reform = baseline_reform
     previous_income_tax = baseline_income_tax.copy()
     previous_state_income_tax = state_income_tax.copy()
     previous_net_income = baseline_net_income.copy()
@@ -131,10 +131,7 @@ def calculate_stacked_household_impacts(reforms, baseline_reform, year):
         print(f"Processing {reform_name}...")
         
         # Stack the reform
-        if cumulative_reform is None:
-            cumulative_reform = reform
-        else:
-            cumulative_reform = (cumulative_reform, reform)
+        cumulative_reform = (cumulative_reform, reform)
         
         # Calculate with cumulative reforms
         reformed = Microsimulation(reform=cumulative_reform, dataset=dataset_path)
