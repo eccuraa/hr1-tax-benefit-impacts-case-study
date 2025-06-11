@@ -14,11 +14,11 @@ def tcja_reform():
             "gov.irs.income.exemption.amount": {"2026-01-01.2100-12-31": 0},
             "gov.irs.deductions.qbi.max.w2_wages.rate": {"2026-01-01.2100-12-31": 0.5},
             "gov.irs.deductions.standard.amount.JOINT": {
-                "2026-01-01.2026-12-31": 30600,
+                "2026-01-01.2026-12-31": 30300,
             },
             "gov.irs.credits.ctc.amount.base[0].amount": {"2026-01-01.2100-12-31": 2000},
             "gov.irs.deductions.standard.amount.SINGLE": {
-                "2026-01-01.2026-12-31": 15300,
+                "2026-01-01.2026-12-31": 15150,
             },
             "gov.irs.income.amt.exemption.amount.JOINT": {
                 "2026-01-01.2026-12-31": 139850,
@@ -53,7 +53,7 @@ def tcja_reform():
             },
             "gov.irs.deductions.itemized.casualty.active": {"2026-01-01.2100-12-31": False},
             "gov.irs.deductions.standard.amount.SEPARATE": {
-                "2026-01-01.2026-12-31": 15300,
+                "2026-01-01.2026-12-31": 15150,
             },
             "gov.irs.deductions.qbi.max.w2_wages.alt_rate": {"2026-01-01.2100-12-31": 0.25},
             "gov.irs.deductions.qbi.phase_out.start.JOINT": {
@@ -117,13 +117,13 @@ def tcja_reform():
                 "2026-01-01.2026-12-31": 1278575,
             },
             "gov.irs.deductions.standard.amount.SURVIVING_SPOUSE": {
-                "2026-01-01.2026-12-31": 30600,
+                "2026-01-01.2026-12-31": 30300,
             },
             "gov.irs.income.amt.exemption.phase_out.start.SINGLE": {
                 "2026-01-01.2026-12-31": 639300,
             },
             "gov.irs.deductions.standard.amount.HEAD_OF_HOUSEHOLD": {
-                "2026-01-01.2026-12-31": 22950,
+                "2026-01-01.2026-12-31": 22700,
             },
             "gov.irs.income.amt.exemption.amount.SURVIVING_SPOUSE": {
                 "2026-01-01.2026-12-31": 139850,
@@ -302,22 +302,22 @@ def hr1_tax_rate_reform():
 def hr1_sd_reform():
     return Reform.from_dict({
         "gov.irs.deductions.standard.amount.JOINT": {
-            "2026-01-01.2026-12-31": 30600,
+            "2026-01-01.2026-12-31": 32300,
         },
         "gov.irs.deductions.standard.amount.SINGLE": {
-            "2026-01-01.2026-12-31": 15300,
+            "2026-01-01.2026-12-31": 16150,
         },
         "gov.irs.deductions.standard.amount.SEPARATE": {
-            "2026-01-01.2026-12-31": 15300,
+            "2026-01-01.2026-12-31": 16150,
         },
         "gov.contrib.reconciliation.additional_senior_standard_deduction.in_effect": {
             "2025-01-01.2028-12-31": True
         },
         "gov.irs.deductions.standard.amount.SURVIVING_SPOUSE": {
-            "2026-01-01.2026-12-31": 30600,
+            "2026-01-01.2026-12-31": 32300,
         },
         "gov.irs.deductions.standard.amount.HEAD_OF_HOUSEHOLD": {
-            "2026-01-01.2026-12-31": 22950,
+            "2026-01-01.2026-12-31": 24400,
         },
     }, country_id="us")
 
@@ -334,7 +334,7 @@ def hr1_ctc_reform():
             "2025-01-01.2100-12-31": True
         },
         "gov.irs.credits.ctc.amount.base[0].amount": {
-            "2025-01-01.2028-12-31": 2500,
+            "2025-01-01.2028-12-31": 2500
         },
         "gov.irs.credits.ctc.amount.adult_dependent": {
             "2026-01-01.2100-12-31": 500
@@ -343,11 +343,7 @@ def hr1_ctc_reform():
             "2026-01-01.2100-12-31": 400000
         },
         "gov.irs.credits.ctc.refundable.individual_max": {
-            "2026-01-01.2026-12-31": 1700,
-            "2027-01-01.2028-12-31": 1800,
-            "2029-01-01.2031-12-31": 1900,
-            "2032-01-01.2033-12-31": 2000,
-            "2034-01-01.2100-12-31": 2100
+            "2026-01-01.2026-12-31": 1700
         },
         "gov.irs.credits.ctc.phase_out.threshold.SINGLE": {
             "2026-01-01.2100-12-31": 200000
