@@ -50,6 +50,8 @@ def calculate_stacked_household_impacts(reforms, baseline_reform, year):
     overtime_income = baseline.calculate("fsla_overtime_premium", map_to="household", period=year).values
     auto_loan_interest = baseline.calculate("auto_loan_interest", map_to="household", period=year).values
     household_weight = baseline.calculate("household_weight", map_to="household", period=year).values
+    gross_income = baseline.calculate("irs_gross_income", map_to="household", period=year).values
+    social_security_benefits = baseline.calculate("social_security", map_to="household", period=year).values
 
     married = married > 0
     
@@ -115,6 +117,8 @@ def calculate_stacked_household_impacts(reforms, baseline_reform, year):
         'Tip Income': tip_income,
         'Overtime Income': overtime_income,
         'Auto Loan Interest': auto_loan_interest,
+        'Social Security Benefits': social_security_benefits,
+        'Gross Income': gross_income,
         'Baseline Federal Tax Liability': baseline_income_tax,
         'Baseline Net Income': baseline_net_income,
         'Household Weight': household_weight,
