@@ -217,7 +217,28 @@ def tcja_reform():
             },
             "gov.irs.credits.estate.base": {
                 "2026-01-01.2026-12-31": 14200000,
-        }
+            },
+            "gov.irs.income.amt.exemption.separate_limit": {
+                "2026-01-01.2026-12-31": 913900,
+            },
+            "gov.irs.deductions.itemized.misc.applies": {
+                "2026-01-01.2100-12-31": False
+            },
+            "gov.irs.deductions.itemized.interest.mortgage.cap.JOINT": {
+                "2026-01-01.2100-12-31": 750000
+            },
+            "gov.irs.deductions.itemized.interest.mortgage.cap.SINGLE": {
+                "2026-01-01.2100-12-31": 750000
+            },
+            "gov.irs.deductions.itemized.interest.mortgage.cap.SEPARATE": {
+                "2026-01-01.2100-12-31": 375000
+            },
+            "gov.irs.deductions.itemized.interest.mortgage.cap.SURVIVING_SPOUSE": {
+                "2026-01-01.2100-12-31": 750000
+            },
+            "gov.irs.deductions.itemized.interest.mortgage.cap.HEAD_OF_HOUSEHOLD": {
+                "2026-01-01.2100-12-31": 750000
+            },
         },
         country_id="us",
     )
@@ -300,27 +321,6 @@ def hr1_tax_rate_reform():
     "gov.irs.income.bracket.thresholds.6.SURVIVING_SPOUSE": {
         "2026-01-01.2026-12-31": 772750,
     },
-    "gov.irs.income.amt.exemption.separate_limit": {
-        "2026-01-01.2026-12-31": 913900,
-    },
-    "gov.irs.deductions.itemized.misc.applies": {
-        "2026-01-01.2100-12-31": False
-    },
-    "gov.irs.deductions.itemized.interest.mortgage.cap.JOINT": {
-        "2026-01-01.2100-12-31": 750000
-    },
-    "gov.irs.deductions.itemized.interest.mortgage.cap.SINGLE": {
-        "2026-01-01.2100-12-31": 750000
-    },
-    "gov.irs.deductions.itemized.interest.mortgage.cap.SEPARATE": {
-        "2026-01-01.2100-12-31": 375000
-    },
-    "gov.irs.deductions.itemized.interest.mortgage.cap.SURVIVING_SPOUSE": {
-        "2026-01-01.2100-12-31": 750000
-    },
-    "gov.irs.deductions.itemized.interest.mortgage.cap.HEAD_OF_HOUSEHOLD": {
-        "2026-01-01.2100-12-31": 750000
-    },
     }, country_id="us")
 
 def hr1_sd_reform():
@@ -333,9 +333,6 @@ def hr1_sd_reform():
         },
         "gov.irs.deductions.standard.amount.SEPARATE": {
             "2026-01-01.2026-12-31": 16150,
-        },
-        "gov.contrib.reconciliation.additional_senior_standard_deduction.in_effect": {
-            "2025-01-01.2028-12-31": True
         },
         "gov.irs.deductions.standard.amount.SURVIVING_SPOUSE": {
             "2026-01-01.2026-12-31": 32300,
@@ -526,6 +523,13 @@ def hr1_overtime_reform():
         }
     }, country_id="us")
 
+def hr1_senior_deduction_reform():
+    return Reform.from_dict({
+        "gov.contrib.reconciliation.additional_senior_standard_deduction.in_effect": {
+            "2025-01-01.2028-12-31": True
+        },
+    }, country_id="us")
+
 def hr1_auto_loan_reform():
     return Reform.from_dict({
         "gov.contrib.reconciliation.auto_loan_interest_ald.in_effect": {
@@ -591,6 +595,7 @@ def get_all_reforms():
         "Pease Reform": hr1_pease_reform(),
         "Tip Income Exempt": hr1_tip_reform(),
         "Overtime Income Exempt": hr1_overtime_reform(),
+        "Senior Deduction Reform": hr1_senior_deduction_reform(),
         "Auto Loan Interest ALD": hr1_auto_loan_reform(),
         "SALT Reform": hr1_salt_reform(),
     }
