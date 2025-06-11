@@ -50,6 +50,8 @@ def calculate_stacked_household_impacts(reforms, baseline_reform, year):
     overtime_income = baseline.calculate("fsla_overtime_premium", map_to="household", period=year).values
     auto_loan_interest = baseline.calculate("auto_loan_interest", map_to="household", period=year).values
     household_weight = baseline.calculate("household_weight", map_to="household", period=year).values
+    gross_income = baseline.calculate("irs_gross_income", map_to="household", period=year).values
+    social_security_benefits = baseline.calculate("social_security", map_to="household", period=year).values
 
     married = married > 0
     
@@ -115,13 +117,15 @@ def calculate_stacked_household_impacts(reforms, baseline_reform, year):
         'Tip Income': tip_income,
         'Overtime Income': overtime_income,
         'Auto Loan Interest': auto_loan_interest,
+        'Social Security Benefits': social_security_benefits,
+        'Gross Income': gross_income,
         'Baseline Federal Tax Liability': baseline_income_tax,
         'Baseline Net Income': baseline_net_income,
         'Household Weight': household_weight,
     }
 
     # Track cumulative values
-    cumulative_reform = None
+    cumulative_reform = baseline_reform
     previous_income_tax = baseline_income_tax.copy()
     previous_state_income_tax = state_income_tax.copy()
     previous_net_income = baseline_net_income.copy()
@@ -131,10 +135,7 @@ def calculate_stacked_household_impacts(reforms, baseline_reform, year):
         print(f"Processing {reform_name}...")
         
         # Stack the reform
-        if cumulative_reform is None:
-            cumulative_reform = reform
-        else:
-            cumulative_reform = (cumulative_reform, reform)
+        cumulative_reform = (cumulative_reform, reform)
         
         # Calculate with cumulative reforms
         reformed = Microsimulation(reform=cumulative_reform, dataset=dataset_path)
@@ -150,9 +151,9 @@ def calculate_stacked_household_impacts(reforms, baseline_reform, year):
         net_income_change = reformed_net_income - previous_net_income
         
         # Store results
-        results[f'Federal tax liability after {reform_name}'] = tax_change
-        results[f'State tax liability after {reform_name}'] = state_tax_change
-        results[f'Net income change after {reform_name}'] = net_income_change
+        results[f'Change in Federal tax liability after {reform_name}'] = tax_change
+        results[f'Change in State tax liability after {reform_name}'] = state_tax_change
+        results[f'Change in Net income after {reform_name}'] = net_income_change
         
         # Update previous values for next iteration
         previous_income_tax = reformed_income_tax.copy()
@@ -168,12 +169,13 @@ def calculate_stacked_household_impacts(reforms, baseline_reform, year):
     # For tax: handle cases where baseline tax is zero or negative
     pct_tax_change = np.zeros_like(baseline_income_tax)
     mask = baseline_income_tax != 0
-    pct_tax_change[mask] = (results[f'Total Change in Federal Tax Liability'][mask] / baseline_income_tax[mask]) * 100
+    pct_tax_change[mask] = (results[f'Total Change in Federal Tax Liability'][mask] / np.abs(baseline_income_tax[mask])) * 100
+
     
     # For net income: handle cases where baseline net income is zero
     pct_net_income_change = np.zeros_like(baseline_net_income)
     mask = baseline_net_income != 0
-    pct_net_income_change[mask] = (results[f'Total Change in Net Income'][mask] / baseline_net_income[mask]) * 100
+    pct_net_income_change[mask] = (results[f'Total Change in Net Income'][mask] / np.abs(baseline_net_income[mask])) * 100
     
     results[f'Percentage Change in Federal Tax Liability'] = pct_tax_change
     results[f'Percentage Change in Net Income'] = pct_net_income_change
@@ -181,8 +183,8 @@ def calculate_stacked_household_impacts(reforms, baseline_reform, year):
     # Calculate percentage changes for state tax
     pct_state_tax_change = np.zeros_like(state_income_tax)
     mask = state_income_tax != 0
-    pct_state_tax_change[mask] = (results[f'Total Change in State Tax Liability'][mask] / state_income_tax[mask]) * 100
-    
+    pct_state_tax_change[mask] = (results[f'Total Change in State Tax Liability'][mask] / np.abs(state_income_tax[mask])) * 100
+        
     results[f'Percentage Change in State Tax Liability'] = pct_state_tax_change
 
     # Create DataFrame
