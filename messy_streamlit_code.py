@@ -40,6 +40,7 @@ class Constants:
         ("QBID Reform", "QBID Reform"),
         ("AMT Reform", "AMT Reform"),
         ("SALT Reform", "SALT Reform"),
+        ("Estate Tax Reform", "Estate Tax Reform"),
         ("Tip Income Exemption", "Tip Income Exempt"),
         ("Senior Deduction Reform", "Senior Deduction Reform"),
         ("Overtime Income Exemption", "Overtime Income Exempt"),
