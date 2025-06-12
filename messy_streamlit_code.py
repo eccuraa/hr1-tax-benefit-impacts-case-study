@@ -40,6 +40,7 @@ class Constants:
         ("QBID Reform", "QBID Reform"),
         ("AMT Reform", "AMT Reform"),
         ("SALT Reform", "SALT Reform"),
+        ("Estate Tax Reform", "Estate Tax Reform"),
         ("Tip Income Exemption", "Tip Income Exempt"),
         ("Senior Deduction Reform", "Senior Deduction Reform"),
         ("Overtime Income Exemption", "Overtime Income Exempt"),
@@ -90,6 +91,7 @@ class FilterConfig:
             },
             dependent_options=["All", "0", "1", "2", "3+"],
             marital_options=["All", "Married", "Single"]
+            single_tax_unit_only=False  # Default to showing all households (unchecked)
         )
 
 
