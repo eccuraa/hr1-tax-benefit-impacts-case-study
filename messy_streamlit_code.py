@@ -41,6 +41,7 @@ class Constants:
         ("AMT Reform", "AMT Reform"),
         ("SALT Reform", "SALT Reform"),
         ("Tip Income Exemption", "Tip Income Exempt"),
+        ("Senior Deduction Reform", "Senior Deduction Reform"),
         ("Overtime Income Exemption", "Overtime Income Exempt"),
         ("Auto Loan Interest Deduction", "Auto Loan Interest ALD"),
         ("Miscellaneous Reform", "Miscellaneous Reform"),
@@ -373,7 +374,39 @@ class FederalTaxAnalysis(AnalysisEngine):
     
     def get_total_change(self, household_data: pd.Series) -> float:
         return household_data['Total Change in Federal Tax Liability']
-
+        
+class StateTaxAnalysis(AnalysisEngine):
+    """Analysis engine for State Tax impacts"""
+    
+    def get_reform_impacts(self, household_data: pd.Series) -> List[ReformImpact]:
+        reform_configs = Constants.REFORM_COLS
+        
+        impacts = []
+        for display_name, col_name in reform_configs:
+            try:
+                tax_change = household_data[f'Change in State tax liability after {col_name}']
+                
+                impact = ReformImpact(
+                    name=display_name,
+                    total_change=tax_change,
+                )
+                
+                if impact.is_significant:
+                    impacts.append(impact)
+            except KeyError:
+                continue
+        
+        return impacts
+    
+    def get_chart_title(self) -> str:
+        return "State Tax Liability"
+    
+    def get_baseline_value(self, household_data: pd.Series) -> float:
+        # Use existing State Income Tax as baseline since there's no "Baseline State Tax Liability"
+        return household_data.get('State Income Tax', 0)
+    
+    def get_total_change(self, household_data: pd.Series) -> float:
+        return household_data['Total Change in State Tax Liability']
 
 class NetIncomeAnalysis(AnalysisEngine):
     """Analysis engine for Net Income impacts"""
@@ -519,23 +552,30 @@ class VisualizationRenderer:
                 change_value = household_data['Total Change in Federal Tax Liability']
                 pct_change = household_data['Percentage Change in Federal Tax Liability']
                 change_label = "Federal Tax Change"
-                color = "red" if change_value > 0 else "green"  # Tax increase = red, decrease = green
+                color = "red" if change_value > 0 else "green"
+                
+            elif isinstance(self.analysis_engine, StateTaxAnalysis):
+                # Show only State Tax changes
+                change_value = household_data['Total Change in State Tax Liability']
+                pct_change = household_data['Percentage Change in State Tax Liability']
+                change_label = "State Tax Change"
+                color = "red" if change_value > 0 else "green"
                 
             else:  # NetIncomeAnalysis
                 # Show only Net Income changes
                 change_value = household_data['Total Change in Net Income']
                 pct_change = household_data['Percentage Change in Net Income']
                 change_label = "Net Income Change"
-                color = "green" if change_value > 0 else "red"  # Income increase = green, decrease = red
+                color = "green" if change_value > 0 else "red"
             
             st.markdown(f"""
-                    <div style="padding: 10px; border-radius: 5px; background-color: #f0f2f6;">
-                    <h4>Overall Impact</h4>
-                    <p style="color: {color}; font-size: 18px; font-weight: bold;">
-                    {change_label}: ${change_value:,.2f} ({pct_change:+.1f}%)
-                    </p>
-                    </div>
-                    """, unsafe_allow_html=True) 
+            <div style="padding: 10px; border-radius: 5px; background-color: #f0f2f6;">
+            <h4>Overall Impact</h4>
+            <p style="color: {color}; font-size: 18px; font-weight: bold;">
+            {change_label}: ${change_value:,.2f} ({pct_change:+.1f}%)
+            </p>
+            </div>
+            """, unsafe_allow_html=True)
         
         # Statistical weight
         weight = household_data['Household Weight']
@@ -551,21 +591,19 @@ class VisualizationRenderer:
             cols = st.columns(min(3, len(impacts)))
             for i, impact in enumerate(impacts):
                 with cols[i % 3]:
-                    # For tax analysis, show tax changes; for income analysis, show income changes
-                    if isinstance(self.analysis_engine, FederalTaxAnalysis):
-                        value = impact.total_change
+                    # Determine label and color based on analysis type
+                    if isinstance(self.analysis_engine, (FederalTaxAnalysis, StateTaxAnalysis)):
                         label = "Tax Change"
-                        color = "green" if value < 0 else "red"  # Negative tax change is good
-                    else:
-                        value = impact.total_change
+                        color = "green" if impact.total_change < 0 else "red"  # Tax decrease is good
+                    else:  # NetIncomeAnalysis
                         label = "Income Change"
-                        color = "green" if value > 0 else "red"  # Positive income change is good
+                        color = "green" if impact.total_change > 0 else "red"  # Income increase is good
                     
                     st.markdown(f"""
                     <div style="padding: 8px; border-radius: 5px; background-color: #f9f9f9; margin: 5px 0;">
                     <h5>{impact.name}</h5>
                     <p style="color: {color}; font-weight: bold;">
-                    {label}: ${value:,.2f}
+                    {label}: ${impact.total_change:,.2f}
                     </p>
                     </div>
                     """, unsafe_allow_html=True)
@@ -671,16 +709,19 @@ class StoryGenerator:
         # Get biggest impact
         if impacts:
             biggest_impact = max(impacts, key=lambda x: abs(x.total_change))
-            biggest_reform_text = (f"The biggest change comes from the {biggest_impact.name} "
-                                 f"(${biggest_impact.total_change:+,.2f}).")
+            biggest_reform_text = f"The biggest change comes from the {biggest_impact.name} (${biggest_impact.total_change:+,.2f})."
         else:
             biggest_reform_text = "No single reform has a major impact."
         
-        return (f"**Quick Story Angle:** This {profile.state} household "
-                f"{impact_level} {direction} the HR1 bill, with a net income change of $"
-                f"{income_change:,.2f} ({income_pct_change:+.1f}%). {biggest_reform_text} "
-                f"The household represents approximately {math.ceil(profile.household_weight):,} "
-                f"similar American families.")
+        # Build the summary cleanly
+        summary = (
+            f"**Quick Story Angle:** This {profile.state} household {impact_level} {direction} the HR1 bill, "
+            f"with a net income change of ${income_change:,.2f} ({income_pct_change:+.1f}%). "
+            f"{biggest_reform_text} "
+            f"The household represents approximately {math.ceil(profile.household_weight):,} similar American families."
+        )
+        
+        return summary
 
 
 class HouseholdDashboard:
@@ -748,13 +789,15 @@ class HouseholdDashboard:
         
         analysis_type = st.sidebar.radio(
             "Select what to analyze:",
-            [AnalysisType.FEDERAL_TAXES.value, AnalysisType.NET_INCOME.value],
+            [AnalysisType.FEDERAL_TAXES.value, AnalysisType.STATE_TAXES.value, AnalysisType.NET_INCOME.value],
             index=0
         )
         
         # Store in session state for consistency
         if analysis_type == AnalysisType.FEDERAL_TAXES.value:
             st.session_state.analysis_type = AnalysisType.FEDERAL_TAXES
+        elif analysis_type == AnalysisType.STATE_TAXES.value:
+            st.session_state.analysis_type = AnalysisType.STATE_TAXES
         else:
             st.session_state.analysis_type = AnalysisType.NET_INCOME
     
@@ -762,6 +805,8 @@ class HouseholdDashboard:
         """Factory method to create appropriate analysis engine"""
         if analysis_type == AnalysisType.FEDERAL_TAXES:
             return FederalTaxAnalysis()
+        elif analysis_type == AnalysisType.STATE_TAXES:
+            return StateTaxAnalysis()
         elif analysis_type == AnalysisType.NET_INCOME:
             return NetIncomeAnalysis()
         else:
