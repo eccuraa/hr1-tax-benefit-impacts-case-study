@@ -133,8 +133,17 @@ def calculate_stacked_household_impacts(reforms, baseline_reform, year):
         # Get the i-th dependent for each household
         ith_dependent = dependents_df[dependents_df['dep_rank'] == i + 1].groupby('household_id')['age'].first()
         dependent_age_columns[f'Age of Dependent {i+1}'] = ith_dependent.reindex(household_id).values
-        
-        # Reindex to match household_id order and fill missing with NaN
+
+    # Fill NA values with 10 only for households that have that many dependents
+    for i in range(max_dependents):
+        col_name = f'Age of Dependent {i+1}'
+        # Only fill with 10 if the household has at least i+1 dependents
+        mask = (pd.isna(dependent_age_columns[col_name]) & (num_dependents > i))
+        dependent_age_columns[col_name] = np.where(
+            mask,
+            10,  # Fill with 10
+            dependent_age_columns[col_name]  # Keep original value (including NaN)
+        )
 
 
     # Initialize results dictionary
