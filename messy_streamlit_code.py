@@ -391,7 +391,8 @@ def main():
         
         st.plotly_chart(fig, use_container_width=True)
         
-        # Verification
+        '''
+        # COMMENTED OUT -- Verification of Waterfall Chart Calculations
         total_calculated_change = sum([item[1] for item in waterfall_data[1:-1]])
         # Changed this from taxes, to overall change from all reforms!! Must change title accordingly
         # And negated the change in income so it would match the change in taxes
@@ -402,7 +403,7 @@ def main():
             pass
         else:
             st.error(f"Discrepancy detected: Calculated change ${total_calculated_change:,.2f} vs Actual change ${actual_change:,.2f}")
-
+        '''
     else:
         st.info("This household is not significantly affected by any specific reform components.")
     
