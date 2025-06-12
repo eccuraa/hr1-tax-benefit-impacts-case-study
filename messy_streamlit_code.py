@@ -303,21 +303,21 @@ def main():
     
     # Create reform components data
     reform_components = [
-        ("Tax Rate Reform", household['Federal tax liability after Tax Rate Reform'], household['Net income change after Tax Rate Reform']),
-        ("Standard Deduction Reform", household['Federal tax liability after Standard Deduction Reform'], household['Net income change after Standard Deduction Reform']),
-        ("Exemption Reform", household['Federal tax liability after Exemption Reform'], household['Net income change after Exemption Reform']),
-        ("Child Tax Credit Reform", household['Federal tax liability after CTC Reform'], household['Net income change after CTC Reform']),
-        ("QBID Reform", household['Federal tax liability after QBID Reform'], household['Net income change after QBID Reform']),
+        ("Tax Rate Reform", household['Change in Federal tax liability after Tax Rate Reform'], household['Change in Net income after Tax Rate Reform']),
+        ("Standard Deduction Reform", household['Change in Federal tax liability after Standard Deduction Reform'], household['Change in Net income after Standard Deduction Reform']),
+        ("Exemption Reform", household['Change in Federal tax liability after Exemption Reform'], household['Change in Net income after Exemption Reform']),
+        ("Child Tax Credit Reform", household['Change in Federal tax liability after CTC Reform'], household['Change in Net income after CTC Reform']),
+        ("QBID Reform", household['Change in Federal tax liability after QBID Reform'], household['Change in Net income after QBID Reform']),
         # Removed Estate Tax Reform, because it doesn't directly affect Federal Income Tax, like the other reforms.
         #("Estate Tax Reform", household['Federal tax liability after Estate Tax Reform'], household['Net income change after Estate Tax Reform']),
-        ("AMT Reform", household['Federal tax liability after AMT Reform'], household['Net income change after AMT Reform']),
-        ("SALT Reform", household['Federal tax liability after SALT Reform'], household['Net income change after SALT Reform']),
-        ("Tip Income Exemption", household['Federal tax liability after Tip Income Exempt'], household['Net income change after Tip Income Exempt']),
-        ("Overtime Income Exemption", household['Federal tax liability after Overtime Income Exempt'], household['Net income change after Overtime Income Exempt']),
-        ("Auto Loan Interest Deduction", household['Federal tax liability after Auto Loan Interest ALD'], household['Net income change after Auto Loan Interest ALD']),
-        ("Miscellaneous Reform", household['Federal tax liability after Miscellaneous Reform'], household['Net income change after Miscellaneous Reform']),
-        ("Other Itemized Deductions Reform", household['Federal tax liability after Other Itemized Deductions Reform'], household['Net income change after Other Itemized Deductions Reform']),
-        ("Pease Reform", household['Federal tax liability after Pease Reform'], household['Net income change after Pease Reform'])
+        ("AMT Reform", household['Change in Federal tax liability after AMT Reform'], household['Change in Net income after AMT Reform']),
+        ("SALT Reform", household['Change in Federal tax liability after SALT Reform'], household['Change in Net income after SALT Reform']),
+        ("Tip Income Exemption", household['Change in Federal tax liability after Tip Income Exempt'], household['Change in Net income after Tip Income Exempt']),
+        ("Overtime Income Exemption", household['Change in Federal tax liability after Overtime Income Exempt'], household['Change in Net income after Overtime Income Exempt']),
+        ("Auto Loan Interest Deduction", household['Change in Federal tax liability after Auto Loan Interest ALD'], household['Change in Net income after Auto Loan Interest ALD']),
+        ("Miscellaneous Reform", household['Change in Federal tax liability after Miscellaneous Reform'], household['Change in Net income after Miscellaneous Reform']),
+        ("Other Itemized Deductions Reform", household['Change in Federal tax liability after Other Itemized Deductions Reform'], household['Change in Net income after Other Itemized Deductions Reform']),
+        ("Pease Reform", household['Change in Federal tax liability after Pease Reform'], household['Change in Net income after Pease Reform'])
     ]
     
     # Filter out components with no change
