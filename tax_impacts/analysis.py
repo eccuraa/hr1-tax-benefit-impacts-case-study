@@ -40,7 +40,6 @@ def calculate_stacked_household_impacts(reforms, baseline_reform, year):
     household_id = baseline.calculate("household_id", map_to="household", period=year).values
     state = baseline.calculate("state_code", map_to="household", period=year).values
     num_dependents = baseline.calculate("tax_unit_dependents", map_to="household", period=year).values
-    married = baseline.calculate("is_married", map_to="household", period=year).values
     employment_income = baseline.calculate("employment_income", map_to="household", period=year).values
     self_employment_income = baseline.calculate("self_employment_income", map_to="household", period=year).values
     capital_gains = baseline.calculate("capital_gains", map_to="household", period=year).values
@@ -53,7 +52,6 @@ def calculate_stacked_household_impacts(reforms, baseline_reform, year):
     gross_income = baseline.calculate("irs_gross_income", map_to="household", period=year).values
     social_security_benefits = baseline.calculate("social_security", map_to="household", period=year).values
 
-    married = married > 0
     
     # Get person-level values
     age = baseline.calculate("age", map_to="person", period=year).values
@@ -61,32 +59,71 @@ def calculate_stacked_household_impacts(reforms, baseline_reform, year):
     is_head = baseline.calculate("is_tax_unit_head", map_to="person", period=year).values
     is_spouse = baseline.calculate("is_tax_unit_spouse", map_to="person", period=year).values
     is_dependent = baseline.calculate("is_tax_unit_dependent", map_to="person", period=year).values
+    tax_unit_id = baseline.calculate("tax_unit_id", map_to="person", period=year).values
+    is_married = baseline.calculate("is_married", map_to="person", period=year).values
 
 
     # Create a DataFrame with person-level data
     person_df = pd.DataFrame({
         'household_id': person_household,
+        'tax_unit_id': tax_unit_id,
         'age': age,
         'is_dependent': is_dependent,
         'is_head': is_head,
-        'is_spouse': is_spouse
+        'is_spouse': is_spouse,
+        'is_married': is_married,
     })
 
-    # Get head ages
-    head_ages = person_df[person_df['is_head']].groupby('household_id')['age'].first()
-    age_head = head_ages.reindex(household_id).fillna(0).values
 
-    # Get spouse ages
-    spouse_ages = person_df[person_df['is_spouse']].groupby('household_id')['age'].first()
-    age_spouse = spouse_ages.reindex(household_id).fillna(0).values
 
-    # Get dependent ages - create separate columns
-    # First, get all dependents and add a rank within each household
-    dependents_df = person_df[person_df['is_dependent']].copy()
+    # Count tax units per household
+    tax_units_per_household = person_df[person_df['is_head']].groupby('household_id')['tax_unit_id'].nunique()
+    num_tax_units = tax_units_per_household.reindex(household_id).fillna(1).values
+
+    # Identify the first tax unit in each household
+    # First, get all tax unit heads and sort by household_id and tax_unit_id
+    tax_unit_heads = person_df[person_df['is_head']].sort_values(['household_id', 'tax_unit_id'])
+    first_tax_unit_per_household = tax_unit_heads.groupby('household_id')['tax_unit_id'].first()
+
+    # Create a mapping of household_id to first tax_unit_id
+    first_tax_unit_map = first_tax_unit_per_household.to_dict()
+    
+    # Filter person_df to only include people from the first tax unit in each household
+    person_df['is_first_tax_unit'] = person_df.apply(
+        lambda row: row['tax_unit_id'] == first_tax_unit_map.get(row['household_id']), 
+        axis=1
+    )
+    
+    # Now get ages only from the first tax unit
+    first_tu_df = person_df[person_df['is_first_tax_unit']]
+    
+    # Get married status from first tax unit only
+    # Use the head's married status from the first tax unit
+    married_status = first_tu_df[first_tu_df['is_head']].groupby('household_id')['is_married'].first()
+    is_married = married_status.reindex(household_id).fillna(False).values.astype(bool)
+
+
+    # Get head ages (from first tax unit only)
+    head_ages = first_tu_df[first_tu_df['is_head']].groupby('household_id')['age'].first()
+    age_head = head_ages.reindex(household_id).values
+
+    # Get spouse ages (from first tax unit only)
+    spouse_ages = first_tu_df[first_tu_df['is_spouse']].groupby('household_id')['age'].first()
+    age_spouse = spouse_ages.reindex(household_id).values
+
+    # Fill missing spouse ages with 40 only if married
+    age_spouse = np.where(
+        pd.isna(age_spouse) & is_married,  # If age is NaN AND household is married
+        40,                                  # Fill with 40
+        age_spouse                           # Otherwise keep original value (including NaN)
+    )
+
+    # Get dependent ages (from first tax unit only)
+    dependents_df = first_tu_df[first_tu_df['is_dependent']].copy()
     dependents_df['dep_rank'] = dependents_df.groupby('household_id')['age'].rank(method='first')
 
-    # Determine max number of dependents
-    max_dependents = int(num_dependents.max()) if num_dependents.max() > 0 else 0
+    # Determine max number of dependents (in first tax units)
+    max_dependents = int(dependents_df.groupby('household_id').size().max()) if len(dependents_df) > 0 else 0
 
     # Create a dictionary to hold dependent age columns
     dependent_age_columns = {}
@@ -95,20 +132,21 @@ def calculate_stacked_household_impacts(reforms, baseline_reform, year):
     for i in range(max_dependents):
         # Get the i-th dependent for each household
         ith_dependent = dependents_df[dependents_df['dep_rank'] == i + 1].groupby('household_id')['age'].first()
+        dependent_age_columns[f'Age of Dependent {i+1}'] = ith_dependent.reindex(household_id).values
         
         # Reindex to match household_id order and fill missing with NaN
-        dependent_age_columns[f'Age of Dependent {i+1}'] = ith_dependent.reindex(household_id).values
 
 
     # Initialize results dictionary
     results = {
         'Household ID': household_id,
         'State': state,
+        'Number of Tax Units': num_tax_units,  
         'Age of Head': age_head,
         'Age of Spouse': age_spouse,
-        **dependent_age_columns,  # Add here
+        **dependent_age_columns,  # Add dependent ages from first tax unit
         'Number of Dependents': num_dependents,
-        'Is Married': married,
+        'Is Married': is_married,
         'Employment Income': employment_income,
         'Self-Employment Income': self_employment_income,
         'Capital Gains': capital_gains,
