@@ -235,7 +235,7 @@ class FilterManager:
         return df
         
     def _apply_tax_unit_filter(self, df: pd.DataFrame) -> pd.DataFrame:
-        selected = st.checkbox("Households with Only One Tax Unit", value=self.config.single_tax_unit)
+        selected = st.checkbox("Households with Only 1 Tax Unit", value=self.config.single_tax_unit)
         if selected:
             return df[df['Number of Tax Units'] == 1]
         return df
