@@ -764,7 +764,7 @@ class VisualizationRenderer:
             xaxis={'tickangle': -45},
             yaxis={'range': [
                 min(0, min([item[2] for item in waterfall_data]) * 1.15),
-                max([item[2] for item in waterfall_data]) * 1.15
+                max(0, max([item[2] for item in waterfall_data]) * 1.15)
             ]})
         
         return fig
