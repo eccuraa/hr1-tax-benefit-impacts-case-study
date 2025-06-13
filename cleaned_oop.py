@@ -25,7 +25,7 @@ class AnalysisType(Enum):
 
 class Constants:
     """Application constants and configuration"""
-    CSV_FILENAME = "thursday_early.csv"
+    CSV_FILENAME = "household_tax_income_changes.csv"
     INCOME_CHANGE_THRESHOLD = 0.01
     SIGNIFICANT_IMPACT_THRESHOLD = 1000
     MODERATE_IMPACT_THRESHOLD = 100
@@ -91,7 +91,7 @@ class FilterConfig:
             },
             dependent_options=["All", "0", "1", "2", "3+"],
             marital_options=["All", "Married", "Single"],
-            single_tax_unit_only=False  # Default to showing all households (unchecked)
+            #single_tax_unit_only=False  # Default to showing all households (unchecked)
         )
 
 
