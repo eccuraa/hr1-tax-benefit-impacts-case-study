@@ -793,12 +793,11 @@ class StoryGenerator:
         summary = (
             f"**Quick Story Angle:** This {profile.state} household {impact_level} {direction} the HR1 bill, "
             f"with a net income change of ${income_change:,.2f} ({income_pct_change:+.1f}%). "
-            f"{biggest_reform_text} "
+            #f"{biggest_reform_text} "
             f"The household represents approximately {math.ceil(profile.household_weight):,} similar American families."
         )
         
         return summary
-
 
 class HouseholdDashboard:
     """Main dashboard application orchestrator"""
