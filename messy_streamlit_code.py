@@ -766,17 +766,17 @@ class HouseholdDashboard:
             household_data = self._get_household_data(df_filtered, household_id)
             profile = HouseholdProfile.from_series(household_data)
             
+            # Render UI
+            renderer = VisualizationRenderer(analysis_engine)
+            renderer.render_sidebar_household_info(profile, household_data)
+            renderer.render_main_content(profile, household_data)
+
             # Render sidebar info
             self._render_analysis_type_selector()
             analysis_type = st.session_state.get('analysis_type', AnalysisType.FEDERAL_TAXES)
             
             # Create analysis engine based on selection
             analysis_engine = self._create_analysis_engine(analysis_type)
-            
-            # Render UI
-            renderer = VisualizationRenderer(analysis_engine)
-            renderer.render_sidebar_household_info(profile, household_data)
-            renderer.render_main_content(profile, household_data)
             
             # Generate story summary
             impacts = analysis_engine.get_reform_impacts(household_data)
