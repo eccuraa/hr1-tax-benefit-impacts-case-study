@@ -255,7 +255,7 @@ class HouseholdSelector:
         """Select household based on user choice"""
         selection_method = st.sidebar.radio(
             "Selection Method:",
-            ["By Household ID", "Find Interesting Cases", "Random Shuffle"]
+            ["Random Shuffle", "By Household ID", "Find Interesting Cases"]
         )
         
         if selection_method == "By Household ID":
@@ -524,9 +524,10 @@ class VisualizationRenderer:
         col1, col2 = st.columns(2)
         
         with col1:
-            self._render_baseline_info(profile, household_data)
+            self._render_weight_info(household_data)
         
         with col2:
+            self._render_baseline_info(profile, household_data)
             self._render_impact_summary(household_data)
         
         # Get impacts and render analysis
@@ -537,67 +538,56 @@ class VisualizationRenderer:
             self._render_waterfall_chart(impacts, household_data)
         else:
             st.info("This household is not significantly affected by any specific reform components.")
+
+    def _render_weight_info(self, household_data: pd.Series) -> None:
+
+        # Statistical weight
+        weight = household_data['Household Weight']
+        st.subheader("📈 Statistical Weight")
+        with st.container():
+            st.metric("Population Weight", f"{math.ceil(weight):,}")
+            st.caption("This household represents approximately this many similar households in the U.S.")
+
             
     def _render_baseline_info(self, profile: HouseholdProfile, household_data: pd.Series) -> None:
-        st.subheader("Baseline Values")
+        st.subheader("🔄 HR1 Bill Impact Summary")
         
         with st.container():
-            # Get baseline value and label based on analysis type
-            if isinstance(self.analysis_engine, FederalTaxAnalysis):
-                baseline_value = profile.baseline_federal_tax
-                baseline_label = "Federal Taxes"
-                
-                # Get additional taxes
-                additional_taxes = []
-                state_tax = household_data.get('State Income Tax', 0)
-                property_tax = household_data.get('Property Taxes', 0)
-                
-                if state_tax > 0:
-                    additional_taxes.append(f"State Taxes: ${state_tax:,.2f}")
-                if property_tax > 0:
-                    additional_taxes.append(f"Property Taxes: ${property_tax:,.2f}")
-                    
-            elif isinstance(self.analysis_engine, StateTaxAnalysis):
-                baseline_value = household_data.get('State Income Tax', 0)
-                baseline_label = "State Taxes"
-                
-                # Get additional taxes
-                additional_taxes = [f"Federal Taxes: ${profile.baseline_federal_tax:,.2f}"]
-                property_tax = household_data.get('Property Taxes', 0)
-                if property_tax > 0:
-                    additional_taxes.append(f"Property Taxes: ${property_tax:,.2f}")
-                    
-            else:  # NetIncomeAnalysis
-                baseline_value = profile.baseline_net_income
-                baseline_label = "Net Income"
-                
-                # Get additional taxes
-                additional_taxes = [f"Federal Tax Liability: ${profile.baseline_federal_tax:,.2f}"]
-                state_tax = household_data.get('State Taxes', 0)
-                property_tax = household_data.get('Property Taxes', 0)
-                
-                if state_tax > 0:
-                    additional_taxes.append(f"State Taxes: ${state_tax:,.2f}")
-                if property_tax > 0:
-                    additional_taxes.append(f"Property Taxes: ${property_tax:,.2f}")
+            # Get baseline info and additional taxes based on analysis type
+            state_tax = household_data.get('State Income Tax', 0)
+            property_tax = household_data.get('Property Taxes', 0)
             
-            # Create the content for the styled box
+            if isinstance(self.analysis_engine, FederalTaxAnalysis):
+                baseline_value, baseline_label = profile.baseline_federal_tax, "Federal Taxes"
+                additional = [f"State Taxes: ${state_tax:,.2f}" if state_tax > 0 else None,
+                            f"Property Taxes: ${property_tax:,.2f}" if property_tax > 0 else None]
+            elif isinstance(self.analysis_engine, StateTaxAnalysis):
+                baseline_value, baseline_label = state_tax, "State Taxes"
+                additional = [f"Federal Taxes: ${profile.baseline_federal_tax:,.2f}",
+                            f"Property Taxes: ${property_tax:,.2f}" if property_tax > 0 else None]
+            else:  # NetIncomeAnalysis
+                baseline_value, baseline_label = profile.baseline_net_income, "Net Income"
+                additional = [f"Federal Tax Liability: ${profile.baseline_federal_tax:,.2f}",
+                            f"State Taxes: ${state_tax:,.2f}" if state_tax > 0 else None,
+                            f"Property Taxes: ${property_tax:,.2f}" if property_tax > 0 else None]
+            
+            # Build and display content
+            additional_taxes = [tax for tax in additional if tax is not None]
             content = f"<p style='font-size: 18px; font-weight: bold; margin: 0;'>{baseline_label}: ${baseline_value:,.2f}</p>"
             
             if additional_taxes:
                 content += "<p style='margin: 10px 0 0 0;'><strong>Additional Taxes:</strong></p>"
-                for tax in additional_taxes:
-                    content += f"<p style='margin: 2px 0 0 0;'>• {tax}</p>"
+                content += "".join(f"<p style='margin: 2px 0 0 0;'>• {tax}</p>" for tax in additional_taxes)
             
-            # Display in styled box
             st.markdown(f"""
             <div style="padding: 10px; border-radius: 5px; background-color: #f0f2f6;">
+            <h4>Baseline Values</h4>
             {content}
             </div>
             """, unsafe_allow_html=True)
-    
+            st.markdown("<br>", unsafe_allow_html=True)
+
     def _render_impact_summary(self, household_data: pd.Series) -> None:
-        st.subheader("🔄 HR1 Bill Impact Summary")
         
         with st.container():
             # Show different metrics based on analysis type
@@ -631,12 +621,6 @@ class VisualizationRenderer:
             </div>
             """, unsafe_allow_html=True)
         
-        # Statistical weight
-        weight = household_data['Household Weight']
-        st.subheader("📈 Statistical Weight")
-        with st.container():
-            st.metric("Population Weight", f"{math.ceil(weight):,}")
-            st.caption("This household represents approximately this many similar households in the U.S.")
     
     def _render_reform_breakdown(self, impacts: List[ReformImpact]) -> None:
         st.subheader("🔍 Detailed Reform Component Analysis")
