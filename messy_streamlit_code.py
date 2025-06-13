@@ -537,49 +537,64 @@ class VisualizationRenderer:
             self._render_waterfall_chart(impacts, household_data)
         else:
             st.info("This household is not significantly affected by any specific reform components.")
-    
+            
     def _render_baseline_info(self, profile: HouseholdProfile, household_data: pd.Series) -> None:
         st.subheader("Baseline Values")
         
         with st.container():
-            # Show main metric based on analysis type
+            # Get baseline value and label based on analysis type
             if isinstance(self.analysis_engine, FederalTaxAnalysis):
-                st.metric("Federal Tax Liability", f"${profile.baseline_federal_tax:,.2f}")
+                baseline_value = profile.baseline_federal_tax
+                baseline_label = "Federal Taxes"
                 
-                # Show additional taxes
-                st.markdown("**Additional Taxes:**")
+                # Get additional taxes
+                additional_taxes = []
                 state_tax = household_data.get('State Income Tax', 0)
                 property_tax = household_data.get('Property Taxes', 0)
                 
                 if state_tax > 0:
-                    st.markdown(f"• State Tax Liability: ${state_tax:,.2f}")
+                    additional_taxes.append(f"State Taxes: ${state_tax:,.2f}")
                 if property_tax > 0:
-                    st.markdown(f"• Property Taxes: ${property_tax:,.2f}")
+                    additional_taxes.append(f"Property Taxes: ${property_tax:,.2f}")
                     
             elif isinstance(self.analysis_engine, StateTaxAnalysis):
-                state_tax = household_data.get('State Income Tax', 0)
-                st.metric("State Tax Liability", f"${state_tax:,.2f}")
+                baseline_value = household_data.get('State Income Tax', 0)
+                baseline_label = "State Taxes"
                 
-                # Show additional taxes
-                st.markdown("**Additional Taxes:**")
-                st.markdown(f"• Federal Tax Liability: ${profile.baseline_federal_tax:,.2f}")
+                # Get additional taxes
+                additional_taxes = [f"Federal Taxes: ${profile.baseline_federal_tax:,.2f}"]
                 property_tax = household_data.get('Property Taxes', 0)
                 if property_tax > 0:
-                    st.markdown(f"• Property Taxes: ${property_tax:,.2f}")
+                    additional_taxes.append(f"Property Taxes: ${property_tax:,.2f}")
                     
             else:  # NetIncomeAnalysis
-                st.metric("Net Income", f"${profile.baseline_net_income:,.2f}")
+                baseline_value = profile.baseline_net_income
+                baseline_label = "Net Income"
                 
-                # Show additional taxes
-                st.markdown("**Additional Taxes:**")
-                st.markdown(f"• Federal Tax Liability: ${profile.baseline_federal_tax:,.2f}")
-                state_tax = household_data.get('State Income Tax', 0)
+                # Get additional taxes
+                additional_taxes = [f"Federal Tax Liability: ${profile.baseline_federal_tax:,.2f}"]
+                state_tax = household_data.get('State Taxes', 0)
                 property_tax = household_data.get('Property Taxes', 0)
                 
                 if state_tax > 0:
-                    st.markdown(f"• State Tax Liability: ${state_tax:,.2f}")
+                    additional_taxes.append(f"State Taxes: ${state_tax:,.2f}")
                 if property_tax > 0:
-                    st.markdown(f"• Property Taxes: ${property_tax:,.2f}")
+                    additional_taxes.append(f"Property Taxes: ${property_tax:,.2f}")
+            
+            # Create the content for the styled box
+            content = f"<p style='font-size: 18px; font-weight: bold; margin: 0;'>{baseline_label}: ${baseline_value:,.2f}</p>"
+            
+            if additional_taxes:
+                content += "<p style='margin: 10px 0 0 0;'><strong>Additional Taxes:</strong></p>"
+                for tax in additional_taxes:
+                    content += f"<p style='margin: 2px 0 0 0;'>• {tax}</p>"
+            
+            # Display in styled box
+            st.markdown(f"""
+            <div style="padding: 10px; border-radius: 5px; background-color: #f0f2f6;">
+            {content}
+            </div>
+            """, unsafe_allow_html=True)
     
     def _render_impact_summary(self, household_data: pd.Series) -> None:
         st.subheader("🔄 HR1 Bill Impact Summary")
