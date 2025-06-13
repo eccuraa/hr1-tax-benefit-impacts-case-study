@@ -539,20 +539,47 @@ class VisualizationRenderer:
             st.info("This household is not significantly affected by any specific reform components.")
     
     def _render_baseline_info(self, profile: HouseholdProfile, household_data: pd.Series) -> None:
-        st.subheader("Baseline Federal Tax and Net Income")
+        st.subheader("Baseline Values")
         
         with st.container():
-            st.metric("Federal Tax Liability", f"${profile.baseline_federal_tax:,.2f}")
-            st.metric("Net Income", f"${profile.baseline_net_income:,.2f}")
-            
-            # Additional taxes
-            state_tax = household_data.get('State Income Tax', 0)
-            property_tax = household_data.get('Property Taxes', 0)
-            
-            if state_tax > 0:
-                st.markdown(f"**State Income Tax:** ${state_tax:,.2f}")
-            if property_tax > 0:
-                st.markdown(f"**Property Taxes:** ${property_tax:,.2f}")
+            # Show main metric based on analysis type
+            if isinstance(self.analysis_engine, FederalTaxAnalysis):
+                st.metric("Federal Tax Liability", f"${profile.baseline_federal_tax:,.2f}")
+                
+                # Show additional taxes
+                st.markdown("**Additional Taxes:**")
+                state_tax = household_data.get('State Income Tax', 0)
+                property_tax = household_data.get('Property Taxes', 0)
+                
+                if state_tax > 0:
+                    st.markdown(f"• State Tax Liability: ${state_tax:,.2f}")
+                if property_tax > 0:
+                    st.markdown(f"• Property Taxes: ${property_tax:,.2f}")
+                    
+            elif isinstance(self.analysis_engine, StateTaxAnalysis):
+                state_tax = household_data.get('State Income Tax', 0)
+                st.metric("State Tax Liability", f"${state_tax:,.2f}")
+                
+                # Show additional taxes
+                st.markdown("**Additional Taxes:**")
+                st.markdown(f"• Federal Tax Liability: ${profile.baseline_federal_tax:,.2f}")
+                property_tax = household_data.get('Property Taxes', 0)
+                if property_tax > 0:
+                    st.markdown(f"• Property Taxes: ${property_tax:,.2f}")
+                    
+            else:  # NetIncomeAnalysis
+                st.metric("Net Income", f"${profile.baseline_net_income:,.2f}")
+                
+                # Show additional taxes
+                st.markdown("**Additional Taxes:**")
+                st.markdown(f"• Federal Tax Liability: ${profile.baseline_federal_tax:,.2f}")
+                state_tax = household_data.get('State Income Tax', 0)
+                property_tax = household_data.get('Property Taxes', 0)
+                
+                if state_tax > 0:
+                    st.markdown(f"• State Tax Liability: ${state_tax:,.2f}")
+                if property_tax > 0:
+                    st.markdown(f"• Property Taxes: ${property_tax:,.2f}")
     
     def _render_impact_summary(self, household_data: pd.Series) -> None:
         st.subheader("🔄 HR1 Bill Impact Summary")
