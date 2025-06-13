@@ -51,7 +51,7 @@ class AppConfig:
         ("Overtime Income Exemption", "Overtime Income Exempt"),
         ("Auto Loan Interest Deduction", "Auto Loan Interest ALD"),
         ("Miscellaneous Reform", "Miscellaneous Reform"),
-        ("Other Itemized Deductions Reform", "Other Itemized Deductions Reform"),
+        ("Limitation on Itemized Deductions", "Other Itemized Deductions Reform"),
         ("Pease Reform", "Pease Reform")
     ]
 
@@ -761,8 +761,11 @@ class VisualizationRenderer:
             yaxis_title=f"{chart_title} ($)",
             showlegend=False,
             height=AppConfig.CHART_HEIGHT,
-            xaxis={'tickangle': -45}
-        )
+            xaxis={'tickangle': -45},
+            yaxis={'range': [
+                min(0, min([item[2] for item in waterfall_data]) * 1.15),
+                max([item[2] for item in waterfall_data]) * 1.15
+            ]})
         
         return fig
 
