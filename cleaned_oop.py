@@ -25,7 +25,7 @@ class AnalysisType(Enum):
 
 class Constants:
     """Application constants and configuration"""
-    CSV_FILENAME = "household_tax_income_changes.csv"
+    CSV_FILENAME = "thursday_early.csv"
     INCOME_CHANGE_THRESHOLD = 0.01
     SIGNIFICANT_IMPACT_THRESHOLD = 1000
     MODERATE_IMPACT_THRESHOLD = 100
