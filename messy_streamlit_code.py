@@ -766,34 +766,29 @@ class HouseholdDashboard:
             household_data = self._get_household_data(df_filtered, household_id)
             profile = HouseholdProfile.from_series(household_data)
             
-            # Get analysis type and create engine FIRST (before any rendering)
-            analysis_type = st.session_state.get('analysis_type', AnalysisType.FEDERAL_TAXES)
-            analysis_engine = self._create_analysis_engine(analysis_type)
-            renderer = VisualizationRenderer(analysis_engine)
-            
-            # Render sidebar household info FIRST (appears at top of sidebar)
-            renderer.render_sidebar_household_info(profile, household_data)
-            
-            # Render analysis type selector SECOND (appears below household info)
+            # Render sidebar info
             self._render_analysis_type_selector()
+            analysis_type = st.session_state.get('analysis_type', AnalysisType.FEDERAL_TAXES)
             
-            # Render main content
+            # Create analysis engine based on selection
+            analysis_engine = self._create_analysis_engine(analysis_type)
+            
+            # Render UI
+            renderer = VisualizationRenderer(analysis_engine)
+            renderer.render_sidebar_household_info(profile, household_data)
             renderer.render_main_content(profile, household_data)
             
             # Generate story summary
             impacts = analysis_engine.get_reform_impacts(household_data)
             story_summary = StoryGenerator.generate_story_summary(profile, household_data, impacts)
             self._render_story_summary(story_summary)
-    
+
             # Add analysis info card at the bottom
             renderer.render_analysis_info_card()
             
         except Exception as e:
             logger.error(f"Error running dashboard: {str(e)}")
             st.error(f"An error occurred: {str(e)}")
-            # Print more detailed error for debugging
-            import traceback
-            st.error(f"Detailed error: {traceback.format_exc()}")
     
     def _render_header(self) -> None:
         st.title("🏠 HR1 Tax Bill - Household Impact Dashboard")
