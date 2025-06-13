@@ -59,7 +59,7 @@ class FilterConfig:
     age_ranges: Dict[str, Tuple[int, int]]
     dependent_options: List[str]
     marital_options: List[str]
-    single_tax_unit_only: bool
+    single_tax_unit: bool
 
     @classmethod
     def default(cls) -> 'FilterConfig':
@@ -92,7 +92,7 @@ class FilterConfig:
             },
             dependent_options=["All", "0", "1", "2", "3+"],
             marital_options=["All", "Married", "Single"],
-            single_tax_unit_only=False  # Default to showing all households (unchecked)
+            single_tax_unit = False #Default is unchecked
         )
 
 
@@ -186,6 +186,8 @@ class FilterManager:
             df_filtered = self._apply_marital_filter(df_filtered)
             df_filtered = self._apply_dependents_filter(df_filtered)
             df_filtered = self._apply_age_filter(df_filtered)
+            df_filtered = self._apply_tax_unit_filter(df_filtered)
+        
             
             self._display_filter_results(df_filtered, df)
             
@@ -230,6 +232,12 @@ class FilterManager:
         min_age, max_age = self.config.age_ranges[selected]
         if selected != "All Ages":
             return df[(df['Age of Head'] >= min_age) & (df['Age of Head'] < max_age)]
+        return df
+        
+    def _apply_tax_unit_filter(self, df: pd.DataFrame) -> pd.DataFrame:
+        selected = st.checkbox("Households with Only One Tax Unit", value=self.config.single_tax_unit)
+        if selected:
+            return df[df['Number of Tax Units'] == 1]
         return df
     
     def _display_filter_results(self, df_filtered: pd.DataFrame, df_original: pd.DataFrame) -> None:
@@ -458,7 +466,8 @@ class VisualizationRenderer:
         st.sidebar.markdown(f"""
         **State:** {profile.state}  
         **Head of Household Age:** {profile.age_of_head:.0f} years  
-        **Number of Dependents:** {profile.number_of_dependents:.0f}""")
+        **Number of Dependents:** {profile.number_of_dependents:.0f}  
+        **Number of Tax Units:** {household_data['Number of Tax Units']:.0f}""")
         
         # Children's ages
         self._render_dependent_ages(household_data, profile.number_of_dependents)
