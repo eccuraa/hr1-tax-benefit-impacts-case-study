@@ -131,7 +131,7 @@ class HouseholdProfile:
             is_married=bool(series['Is Married']),
             baseline_federal_tax=series['Baseline Federal Tax Liability'],
             baseline_net_income=series['Baseline Net Income'],
-            household_weight=series['Household Weight'],
+            household_weight=series['Household Weight']
         )
 
 
@@ -466,7 +466,7 @@ class VisualizationRenderer:
         st.sidebar.markdown(f"""
         **State:** {profile.state}  
         **Head of Household Age:** {profile.age_of_head:.0f} years  
-        **Number of Dependents:** {profile.number_of_dependents:.0f})
+        **Number of Dependents:** {profile.number_of_dependents:.0f}  
         **Number of Tax Units:** {household_data['Number of Tax Units']:.0f}""")
         
         # Children's ages
