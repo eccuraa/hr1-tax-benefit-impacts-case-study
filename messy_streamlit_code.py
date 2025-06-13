@@ -3,8 +3,6 @@ HR1 Tax Bill - Household Impact Dashboard
 
 A Streamlit application for analyzing the impact of the HR1 tax bill on individual households.
 Provides interactive filtering, analysis type selection, and detailed impact visualization.
-
-Version: 2.0.0
 """
 
 import logging
