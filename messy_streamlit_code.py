@@ -332,12 +332,13 @@ class HouseholdSelector:
     
     @staticmethod
     def _select_random(df_filtered: pd.DataFrame) -> int:
-        """Select random household with button to reshuffle."""
+        """Select random household with button to reshuffle, biased towards higher weights."""
         if st.sidebar.button("🎲 Get Random Household"):
-            st.session_state.random_household = df_filtered['Household ID'].sample(1).iloc[0]
+            # Use household weight as sampling probability
+            st.session_state.random_household = df_filtered.sample(1, weights='Household Weight')['Household ID'].iloc[0]
         
         if 'random_household' not in st.session_state:
-            st.session_state.random_household = df_filtered['Household ID'].sample(1).iloc[0]
+            st.session_state.random_household = df_filtered.sample(1, weights='Household Weight')['Household ID'].iloc[0]
         
         household_id = st.session_state.random_household
         st.sidebar.info(f"Random Household ID: {household_id}")
