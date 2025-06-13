@@ -723,7 +723,7 @@ class VisualizationRenderer:
                 HouseholdProfile.from_series(household_data), household_data
             )
             
-            change_value, _, _, _ , _ = self.analysis_engine.get_change_info(household_data)
+            change_value, _, _, _, _, _ = self.analysis_engine.get_change_info(household_data)
             
             # Prepare waterfall data
             waterfall_data = [(f"Baseline {chart_title}", baseline_value, baseline_value)]
