@@ -481,7 +481,7 @@ class VisualizationRenderer:
 
     def _render_household_attributes(self, profile: HouseholdProfile, household_data: pd.Series) -> None:
         """Render household information in main content"""
-        st.subheader("Baseline Household Attributes")
+        st.subheader("🏠 Baseline Household Attributes")
         
         with st.container():
             # Get household data
@@ -519,7 +519,7 @@ class VisualizationRenderer:
             content += f"<p><strong>Marital Status:</strong> {marital_info}</p>"
 
             # Add net income and income sources
-            content += f"<p><strong>Net Income:</strong> ${household_data['Baseline Net Income']:,.2f}</p>"
+            content += f"<p style='font-size: 20px; font-weight: bold; margin: 15px 0 10px 0; color: #1f4e79;'><strong>Net Income:</strong> ${household_data['Baseline Net Income']:,.2f}</p>"
 
             income_sources = [
                 ("Employment Income", household_data.get('Employment Income', 0)),
@@ -814,7 +814,6 @@ class HouseholdDashboard:
     def _configure_page(self) -> None:
         st.set_page_config(
             page_title="HR1 Tax Impact Dashboard",
-            page_icon="🏠",
             layout="wide"
         )
     def run(self) -> None:
@@ -853,7 +852,7 @@ class HouseholdDashboard:
             logger.error(f"Error running dashboard: {str(e)}")
             st.error(f"An error occurred: {str(e)}")
     def _render_header(self) -> None:
-        st.title("🏠 HR1 Tax Bill - Household Impact Dashboard")
+        st.title("HR1 Tax Bill - Household Impact Dashboard")
         st.markdown("*Explore how the HR1 tax bill affects individual American households compared to current policy*")
         st.sidebar.header("Select Household")
     
