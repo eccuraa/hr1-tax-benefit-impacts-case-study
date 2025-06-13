@@ -451,32 +451,36 @@ class TaxAnalysisEngine:
         }
         return mapping[self.analysis_type]
     
-    def get_change_info(self, household_data: pd.Series) -> Tuple[float, float, str, str]:
+    def get_change_info(self, household_data: pd.Series) -> Tuple[float, float, str, str, float]:
         """
-        Get change information for impact summary.
+        Get change information for impact summary. Helps to calculate post-reform value, too.
         
         Returns:
-            Tuple[float, float, str, str]: (change_value, pct_change, change_label, color)
+            Tuple[float, float, str, str, float]: (change_value, pct_change, change_label, color, final_value)
         """
         mapping = {
             AnalysisType.FEDERAL_TAXES: (
                 household_data['Total Change in Federal Tax Liability'],
                 household_data['Percentage Change in Federal Tax Liability'],
-                "Federal Tax Change"
+                "Federal Tax Change",
+                household_data['Baseline Federal Tax Liability']
             ),
             AnalysisType.STATE_TAXES: (
                 household_data['Total Change in State Tax Liability'],
                 household_data['Percentage Change in State Tax Liability'],
-                "State Tax Change"
+                "State Tax Change",
+                household_data.get('State Income Tax', 0)
             ),
             AnalysisType.NET_INCOME: (
                 household_data['Total Change in Net Income'],
                 household_data['Percentage Change in Net Income'],
-                "Net Income Change"
+                "Net Income Change",
+                household_data['Baseline Net Income']
             )
         }
         
-        change_value, pct_change, change_label = mapping[self.analysis_type]
+        change_value, pct_change, change_label, baseline_value = mapping[self.analysis_type]
+        final_value = baseline_value + change_value
         
         # Determine color based on analysis type and value
         if self.analysis_type == AnalysisType.NET_INCOME:
@@ -484,7 +488,7 @@ class TaxAnalysisEngine:
         else:
             color = "red" if change_value > 0 else "green"  # Tax increase is bad
             
-        return change_value, pct_change, change_label, color
+        return change_value, pct_change, change_label, color, final_value
     
     def _get_column_prefix(self) -> str:
         """Get the column prefix for reform impact columns."""
@@ -669,11 +673,14 @@ class VisualizationRenderer:
 
     def _render_impact_summary(self, household_data: pd.Series) -> None:
         """Render impact summary with appropriate coloring."""
-        change_value, pct_change, change_label, color = self.analysis_engine.get_change_info(household_data)
+        change_value, pct_change, change_label, color, final_value = self.analysis_engine.get_change_info(household_data)
         
         content = f"""
         <p style="color: {color}; font-size: 18px; font-weight: bold;">
         {change_label}: ${change_value:,.0f} ({pct_change:+.1f}%)
+        </p>
+        <p style="font-size: 16px; font-weight: bold; margin-top: 10px;">
+        Final Value: ${final_value:,.0f}
         </p>
         """
         
