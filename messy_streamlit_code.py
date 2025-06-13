@@ -672,7 +672,7 @@ class VisualizationRenderer:
         
         content = f"""
         <p style="color: {color}; font-size: 18px; font-weight: bold;">
-        {change_label}: ${change_value:,0f} ({pct_change:+.1f}%)
+        {change_label}: ${change_value:,.0f} ({pct_change:+.1f}%)
         </p>
         """
         
