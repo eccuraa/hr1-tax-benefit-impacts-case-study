@@ -508,9 +508,9 @@ class VisualizationRenderer:
             # Build content
             content = f"""
             <p><strong>State:</strong> {profile.state}</p>
+            <p><strong>Number of Tax Units:</strong> {household_data['Number of Tax Units']:.0f}</p>
             <p><strong>Head of Household Age:</strong> {profile.age_of_head:.0f} years</p>
             <p><strong>Number of Dependents:</strong> {num_dependents:.0f}</p>
-            <p><strong>Number of Tax Units:</strong> {household_data['Number of Tax Units']:.0f}</p>
             """
             
             if dependent_ages:
@@ -519,8 +519,7 @@ class VisualizationRenderer:
             content += f"<p><strong>Marital Status:</strong> {marital_info}</p>"
 
             # Add net income and income sources
-            content += f"<p style='font-size: 20px; font-weight: bold; margin: 15px 0 10px 0; color: #1f4e79;'><strong>Net Income:</strong> ${household_data['Baseline Net Income']:,.2f}</p>"
-
+            content += f"<p style='font-size: 20px; font-weight: bold; margin: 15px 0 10px 0;'><strong> 💰 Net Income:</strong> ${household_data['Baseline Net Income']:,.2f}</p>"
             income_sources = [
                 ("Employment Income", household_data.get('Employment Income', 0)),
                 ("Self-Employment Income", household_data.get('Self-Employment Income', 0)),
