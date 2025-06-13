@@ -90,7 +90,7 @@ class FilterConfig:
                 "80+": (80, 200)
             },
             dependent_options=["All", "0", "1", "2", "3+"],
-            marital_options=["All", "Married", "Single"]
+            marital_options=["All", "Married", "Single"],
             single_tax_unit_only=False  # Default to showing all households (unchecked)
         )
 
