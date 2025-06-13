@@ -679,7 +679,7 @@ class VisualizationRenderer:
         <p style="color: {color}; font-size: 18px; font-weight: bold;">
         {change_label}: ${change_value:,.0f} ({pct_change:+.1f}%)
         </p>
-        <p style="font-size: 16px; font-weight: bold; margin-top: 10px;">
+        <p style="font-size: 18px; font-weight: bold; margin-top: 10px;">
         Final Value: ${final_value:,.0f}
         </p>
         """
