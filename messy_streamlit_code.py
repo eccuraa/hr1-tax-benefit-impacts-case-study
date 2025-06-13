@@ -57,11 +57,6 @@ class AppConfig:
         ("Pease Reform", "Pease Reform")
     ]
 
-
-class UIConfig:
-    """UI styling and configuration constants."""
-    CONTAINER_STYLE = "padding: 10px; border-radius: 5px; background-color: #f0f2f6;"
-    
     # Income source mappings for display
     INCOME_SOURCES = [
         ("Employment Income", "Employment Income"),
@@ -71,6 +66,10 @@ class UIConfig:
         ("Capital Gains", "Capital Gains")
     ]
 
+
+class UIConfig:
+    """UI styling and configuration constants."""
+    CONTAINER_STYLE = "padding: 10px; border-radius: 5px; background-color: #f0f2f6;"
 
 @dataclass
 class FilterConfig:
@@ -589,7 +588,7 @@ class VisualizationRenderer:
     def _build_income_sources_content(self, household_data: pd.Series) -> str:
         """Build HTML content for income sources."""
         income_list = []
-        for display_name, column_name in UIConfig.INCOME_SOURCES:
+        for display_name, column_name in AppConfig.INCOME_SOURCES:
             amount = household_data.get(column_name, 0)
             if amount > 0:
                 income_list.append(f"• {display_name}: ${amount:,.2f}")
