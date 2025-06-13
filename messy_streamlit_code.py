@@ -556,7 +556,7 @@ class VisualizationRenderer:
         
         # Add prominent net income display
         content += f"""<p style='font-size: 20px; font-weight: bold; margin: 15px 0 10px 0;'>
-                     <strong> 💰 Net Income:</strong> ${household_data['Baseline Net Income']:,.2f}</p>"""
+                     <strong> 💰 Net Income:</strong> ${household_data['Baseline Net Income']:,.0f}</p>"""
         
         # Add income sources
         income_content = self._build_income_sources_content(household_data)
@@ -589,7 +589,7 @@ class VisualizationRenderer:
         for display_name, column_name in AppConfig.INCOME_SOURCES:
             amount = household_data.get(column_name, 0)
             if amount > 0:
-                income_list.append(f"• {display_name}: ${amount:,.2f}")
+                income_list.append(f"• {display_name}: ${amount:,.0f}")
         
         if income_list:
             content = "<p><strong>Income Sources:</strong></p>"
@@ -630,7 +630,7 @@ class VisualizationRenderer:
         # Build additional taxes content
         additional_content = self._build_additional_taxes_content(profile, household_data)
         
-        content = f"<p style='font-size: 18px; font-weight: bold; margin: 0;'>{baseline_label}: ${baseline_value:,.2f}</p>"
+        content = f"<p style='font-size: 18px; font-weight: bold; margin: 0;'>{baseline_label}: ${baseline_value:,.0f}</p>"
         content += additional_content
         
         self._render_styled_container("Baseline Values", content)
@@ -644,17 +644,17 @@ class VisualizationRenderer:
         # Define additional taxes based on analysis type
         tax_mappings = {
             AnalysisType.FEDERAL_TAXES: [
-                f"State Taxes: ${state_tax:,.2f}" if state_tax > 0 else None,
-                f"Property Taxes: ${property_tax:,.2f}" if property_tax > 0 else None
+                f"State Taxes: ${state_tax:,.0f}" if state_tax > 0 else None,
+                f"Property Taxes: ${property_tax:,.0f}" if property_tax > 0 else None
             ],
             AnalysisType.STATE_TAXES: [
-                f"Federal Taxes: ${profile.baseline_federal_tax:,.2f}",
-                f"Property Taxes: ${property_tax:,.2f}" if property_tax > 0 else None
+                f"Federal Taxes: ${profile.baseline_federal_tax:,.0f}",
+                f"Property Taxes: ${property_tax:,.0f}" if property_tax > 0 else None
             ],
             AnalysisType.NET_INCOME: [
-                f"Federal Tax Liability: ${profile.baseline_federal_tax:,.2f}",
-                f"State Taxes: ${state_tax:,.2f}" if state_tax > 0 else None,
-                f"Property Taxes: ${property_tax:,.2f}" if property_tax > 0 else None
+                f"Federal Tax Liability: ${profile.baseline_federal_tax:,.0f}",
+                f"State Taxes: ${state_tax:,.0f}" if state_tax > 0 else None,
+                f"Property Taxes: ${property_tax:,.0f}" if property_tax > 0 else None
             ]
         }
         
@@ -672,7 +672,7 @@ class VisualizationRenderer:
         
         content = f"""
         <p style="color: {color}; font-size: 18px; font-weight: bold;">
-        {change_label}: ${change_value:,.2f} ({pct_change:+.1f}%)
+        {change_label}: ${change_value:,0f} ({pct_change:+.1f}%)
         </p>
         """
         
@@ -700,7 +700,7 @@ class VisualizationRenderer:
                 <div style="padding: 8px; border-radius: 5px; background-color: #f9f9f9; margin: 5px 0;">
                 <h5>{impact.name}</h5>
                 <p style="color: {color}; font-weight: bold;">
-                {label}: ${impact.total_change:,.2f}
+                {label}: ${impact.total_change:,.0f}
                 </p>
                 </div>
                 """, unsafe_allow_html=True)
@@ -825,7 +825,7 @@ class StoryGenerator:
             direction = "benefits from" if income_change > 0 else "is burdened by"
             
             # Format values separately to avoid f-string corruption
-            income_str = f"${income_change:,.2f}"
+            income_str = f"${income_change:,.0f}"
             pct_str = f"({income_pct_change:+.1f}%)"
             weight_str = f"{math.ceil(household_weight):,}"
             
