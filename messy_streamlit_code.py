@@ -458,72 +458,12 @@ class VisualizationRenderer:
     def __init__(self, analysis_engine: AnalysisEngine):
         self.analysis_engine = analysis_engine
     
-    def render_sidebar_household_info(self, profile: HouseholdProfile, household_data: pd.Series) -> None:
-        """Render household information in sidebar"""
-        st.sidebar.subheader("Baseline Household Attributes")
-        
-        # Basic demographics
-        st.sidebar.markdown(f"""
-        **State:** {profile.state}  
-        **Head of Household Age:** {profile.age_of_head:.0f} years  
-        **Number of Dependents:** {profile.number_of_dependents:.0f}  
-        **Number of Tax Units:** {household_data['Number of Tax Units']:.0f}""")
-        
-        # Children's ages
-        self._render_dependent_ages(household_data, profile.number_of_dependents)
-        
-        # Marital status
-        self._render_marital_status(profile.is_married, profile.age_of_spouse)
-        
-        # Income sources
-        self._render_income_sources(household_data)
-        
-        # Raw data expander
-        self._render_raw_data_expander(household_data)
-    
-    def _render_dependent_ages(self, household_data: pd.Series, num_dependents: int) -> None:
-        if num_dependents > 0:
-            dependent_ages = []
-            for i in range(1, Constants.MAX_DEPENDENTS + 1):
-                age_col = f'Age of Dependent {i}'
-                if age_col in household_data.index:
-                    age = household_data[age_col]
-                    if pd.notna(age) and age > 0:
-                        dependent_ages.append(f"{age:.0f}")
-            
-            if dependent_ages:
-                st.sidebar.markdown(f"**Children's Ages:** {', '.join(dependent_ages)} years")
-    
-    def _render_marital_status(self, is_married: bool, age_of_spouse: Optional[float]) -> None:
-        if is_married and age_of_spouse:
-            st.sidebar.markdown(f"""**Marital Status:** Married  
-        **Spouse Age:** {age_of_spouse:.0f} years""")
-        else:
-            st.sidebar.markdown("**Marital Status:** Single")
-    
-    def _render_income_sources(self, household_data: pd.Series) -> None:
-        st.sidebar.markdown("**Income Sources:**")
-        income_sources = [
-            ("Employment Income", household_data.get('Employment Income', 0)),
-            ("Self-Employment Income", household_data.get('Self-Employment Income', 0)),
-            ("Tip Income", household_data.get('Tip Income', 0)),
-            ("Overtime Income", household_data.get('Overtime Income', 0)),
-            ("Capital Gains", household_data.get('Capital Gains', 0))
-        ]
-        
-        for source_name, amount in income_sources:
-            if amount > 0:
-                st.sidebar.markdown(f"• {source_name}: ${amount:,.2f}")
-    
-    def _render_raw_data_expander(self, household_data: pd.Series) -> None:
-        with st.sidebar.expander("Full Dataframe Row"):
-            st.dataframe(household_data.to_frame().T, use_container_width=True)
-    
     def render_main_content(self, profile: HouseholdProfile, household_data: pd.Series) -> None:
         """Render main dashboard content"""
         col1, col2 = st.columns(2)
         
         with col1:
+            self._render_household_attributes(profile, household_data)
             self._render_weight_info(household_data)
         
         with col2:
@@ -539,8 +479,111 @@ class VisualizationRenderer:
         else:
             st.info("This household is not significantly affected by any specific reform components.")
 
-    def _render_weight_info(self, household_data: pd.Series) -> None:
+    def _render_household_attributes(self, profile: HouseholdProfile, household_data: pd.Series) -> None:
+        """Render household information in main content"""
+        st.subheader("Baseline Household Attributes")
+        
+        with st.container():
+            # Get household data
+            num_dependents = profile.number_of_dependents
+            age_of_spouse = profile.age_of_spouse
+            is_married = profile.is_married
+            
+            # Build children's ages list
+            dependent_ages = []
+            if num_dependents > 0:
+                for i in range(1, Constants.MAX_DEPENDENTS + 1):
+                    age_col = f'Age of Dependent {i}'
+                    if age_col in household_data.index:
+                        age = household_data[age_col]
+                        if pd.notna(age) and age > 0:
+                            dependent_ages.append(f"{age:.0f}")
+            
+            # Build marital status info
+            if is_married and age_of_spouse:
+                marital_info = f"Married<br><strong>Spouse Age:</strong> {age_of_spouse:.0f} years"
+            else:
+                marital_info = "Single"
+            
+            # Build content
+            content = f"""
+            <p><strong>State:</strong> {profile.state}</p>
+            <p><strong>Head of Household Age:</strong> {profile.age_of_head:.0f} years</p>
+            <p><strong>Number of Dependents:</strong> {num_dependents:.0f}</p>
+            <p><strong>Number of Tax Units:</strong> {household_data['Number of Tax Units']:.0f}</p>
+            """
+            
+            if dependent_ages:
+                content += f"<p><strong>Children's Ages:</strong> {', '.join(dependent_ages)} years</p>"
+            
+            content += f"<p><strong>Marital Status:</strong> {marital_info}</p>"
 
+            # Add net income and income sources
+            content += f"<p><strong>Net Income:</strong> ${household_data['Baseline Net Income']:,.2f}</p>"
+
+            income_sources = [
+                ("Employment Income", household_data.get('Employment Income', 0)),
+                ("Self-Employment Income", household_data.get('Self-Employment Income', 0)),
+                ("Tip Income", household_data.get('Tip Income', 0)),
+                ("Overtime Income", household_data.get('Overtime Income', 0)),
+                ("Capital Gains", household_data.get('Capital Gains', 0))
+            ]
+
+            income_list = [f"• {source}: ${amount:,.2f}" for source, amount in income_sources if amount > 0]
+            if income_list:
+                content += "<p><strong>Income Sources:</strong></p>"
+                content += "".join(f"<p style='margin-left: 10px; margin-top: 2px;'>{income}</p>" for income in income_list)
+            
+            st.markdown(f"""
+            <div style="padding: 10px; border-radius: 5px; background-color: #f0f2f6;">
+            {content}
+            </div>
+            """, unsafe_allow_html=True)
+
+        # Raw data expander (outside the styled container)
+        with st.expander("Full Dataframe Row"):
+            st.dataframe(household_data.to_frame().T, use_container_width=True)
+
+    def _render_dependent_ages(self, household_data: pd.Series, num_dependents: int) -> None:
+        if num_dependents > 0:
+            dependent_ages = []
+            for i in range(1, Constants.MAX_DEPENDENTS + 1):
+                age_col = f'Age of Dependent {i}'
+                if age_col in household_data.index:
+                    age = household_data[age_col]
+                    if pd.notna(age) and age > 0:
+                        dependent_ages.append(f"{age:.0f}")
+            
+            if dependent_ages:
+                st.markdown(f"**Children's Ages:** {', '.join(dependent_ages)} years")
+    
+    def _render_marital_status(self, is_married: bool, age_of_spouse: Optional[float]) -> None:
+        if is_married and age_of_spouse:
+            st.markdown(f"""**Marital Status:** Married  
+        **Spouse Age:** {age_of_spouse:.0f} years""")
+        else:
+            st.markdown("**Marital Status:** Single")
+    
+    def _render_income_sources(self, household_data: pd.Series) -> None:
+        st.markdown(f"**Net Income:** ${household_data['Baseline Net Income']:,.2f}")
+        st.markdown("**Income Sources:**")
+        income_sources = [
+            ("Employment Income", household_data.get('Employment Income', 0)),
+            ("Self-Employment Income", household_data.get('Self-Employment Income', 0)),
+            ("Tip Income", household_data.get('Tip Income', 0)),
+            ("Overtime Income", household_data.get('Overtime Income', 0)),
+            ("Capital Gains", household_data.get('Capital Gains', 0))
+        ]
+        
+        for source_name, amount in income_sources:
+            if amount > 0:
+                st.markdown(f"• {source_name}: ${amount:,.2f}")
+    
+    def _render_raw_data_expander(self, household_data: pd.Series) -> None:
+        with st.expander("Full Dataframe Row"):
+            st.dataframe(household_data.to_frame().T, use_container_width=True)
+
+    def _render_weight_info(self, household_data: pd.Series) -> None:
         # Statistical weight
         weight = household_data['Household Weight']
         st.subheader("📈 Statistical Weight")
@@ -548,7 +591,6 @@ class VisualizationRenderer:
             st.metric("Population Weight", f"{math.ceil(weight):,}")
             st.caption("This household represents approximately this many similar households in the U.S.")
 
-            
     def _render_baseline_info(self, profile: HouseholdProfile, household_data: pd.Series) -> None:
         st.subheader("🔄 HR1 Bill Impact Summary")
         
@@ -585,10 +627,10 @@ class VisualizationRenderer:
             {content}
             </div>
             """, unsafe_allow_html=True)
-            st.markdown("<br>", unsafe_allow_html=True)
+            
+        st.markdown("<br>", unsafe_allow_html=True)
 
     def _render_impact_summary(self, household_data: pd.Series) -> None:
-        
         with st.container():
             # Show different metrics based on analysis type
             if isinstance(self.analysis_engine, FederalTaxAnalysis):
@@ -620,7 +662,6 @@ class VisualizationRenderer:
             </p>
             </div>
             """, unsafe_allow_html=True)
-        
     
     def _render_reform_breakdown(self, impacts: List[ReformImpact]) -> None:
         st.subheader("🔍 Detailed Reform Component Analysis")
@@ -722,8 +763,6 @@ class VisualizationRenderer:
         st.info(f"""
         📋 **Analysis Scope:** We are currently analyzing the effects of {reforms_text} on {analysis_focus}.
         """)
-
-
 class StoryGenerator:
     """Generates journalist-friendly story summaries"""
     
@@ -778,7 +817,6 @@ class HouseholdDashboard:
             page_icon="🏠",
             layout="wide"
         )
-    
     def run(self) -> None:
         """Run the main dashboard application"""
         try:
@@ -792,16 +830,15 @@ class HouseholdDashboard:
             household_data = self._get_household_data(df_filtered, household_id)
             profile = HouseholdProfile.from_series(household_data)
             
-            # Render sidebar info
+            # Render analysis type selector
             self._render_analysis_type_selector()
             analysis_type = st.session_state.get('analysis_type', AnalysisType.FEDERAL_TAXES)
             
             # Create analysis engine based on selection
             analysis_engine = self._create_analysis_engine(analysis_type)
             
-            # Render UI
+            # Render UI (household attributes now in main content, not sidebar)
             renderer = VisualizationRenderer(analysis_engine)
-            renderer.render_sidebar_household_info(profile, household_data)
             renderer.render_main_content(profile, household_data)
             
             # Generate story summary
@@ -815,7 +852,6 @@ class HouseholdDashboard:
         except Exception as e:
             logger.error(f"Error running dashboard: {str(e)}")
             st.error(f"An error occurred: {str(e)}")
-    
     def _render_header(self) -> None:
         st.title("🏠 HR1 Tax Bill - Household Impact Dashboard")
         st.markdown("*Explore how the HR1 tax bill affects individual American households compared to current policy*")
