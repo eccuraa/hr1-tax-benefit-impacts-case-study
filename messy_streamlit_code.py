@@ -561,7 +561,7 @@ class VisualizationRenderer:
         
         # Add prominent net income display
         content += f"""<p style='font-size: 20px; font-weight: bold; margin: 15px 0 10px 0;'>
-                     <strong> 💰 Net Income:</strong> ${household_data['Baseline Net Income']:,.0f}</p>"""
+                     <strong> 💰 Gross Income:</strong> ${household_data['Gross Income']:,.0f}</p>"""
         
         # Add income sources
         income_content = self._build_income_sources_content(household_data)
