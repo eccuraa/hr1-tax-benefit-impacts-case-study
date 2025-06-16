@@ -431,8 +431,8 @@ class TaxAnalysisEngine:
     def get_chart_title(self) -> str:
         """Get the appropriate chart title for the analysis type."""
         titles = {
-            AnalysisType.FEDERAL_TAXES: "Federal Tax Liability",
-            AnalysisType.STATE_TAXES: "State Tax Liability", 
+            AnalysisType.FEDERAL_TAXES: "Federal Taxes",
+            AnalysisType.STATE_TAXES: "State Taxes", 
             AnalysisType.NET_INCOME: "Net Income"
         }
         return titles[self.analysis_type]
@@ -657,7 +657,7 @@ class VisualizationRenderer:
                 f"Property Taxes: ${property_tax:,.0f}" if property_tax > 0 else None
             ],
             AnalysisType.NET_INCOME: [
-                f"Federal Tax Liability: ${profile.baseline_federal_tax:,.0f}",
+                f"Federal Taxes: ${profile.baseline_federal_tax:,.0f}",
                 f"State Taxes: ${state_tax:,.0f}" if state_tax > 0 else None,
                 f"Property Taxes: ${property_tax:,.0f}" if property_tax > 0 else None
             ]
