@@ -23,8 +23,8 @@ logger = logging.getLogger(__name__)
 class AnalysisType(Enum):
     """Supported analysis focus types for the dashboard."""
     FEDERAL_TAXES = "Federal Taxes"
-    NET_INCOME = "Net Income"
     STATE_TAXES = "State Taxes"
+    NET_INCOME = "Net Income"
 
 
 class AppConfig:
@@ -885,7 +885,7 @@ class HouseholdDashboard:
             profile = HouseholdProfile.from_series(household_data)
             
             # Set up analysis
-            analysis_type = self._render_analysis_type_selector()
+            analysis_type = self._render_analysis_type_selector(household_data)
             analysis_engine = TaxAnalysisEngine(analysis_type)
             
             # Render main content
@@ -911,7 +911,7 @@ class HouseholdDashboard:
         st.sidebar.header("Select Household")
 
 
-    def _render_analysis_type_selector(self) -> AnalysisType:
+    def _render_analysis_type_selector(self, household_data: pd.Series) -> AnalysisType:
         """Render analysis type selector in sidebar with percent changes."""
         st.sidebar.markdown("---")
         st.sidebar.subheader("Analysis Type")
@@ -920,22 +920,17 @@ class HouseholdDashboard:
         
         options = []
         for display_value, enum_type in type_mapping.items():
-            label = display_value
-            if hasattr(self, 'household_data') and self.household_data is not None:
-                try:
-                    current = getattr(self, 'analysis_type', None)
-                    self.analysis_type = enum_type
-                    _, pct, *_ = self.analysis_engine.get_change_info(self.household_data)
-                    if current: self.analysis_type = current
-                    label = f"{display_value} ({pct:+.1f}%)"
-                except:
-                    pass
+            # Create temporary analysis engine for this type
+            temp_engine = TaxAnalysisEngine(enum_type)  # <-- Creating a temporary engine
+            _, pct, *_ = temp_engine.get_change_info(household_data)  # <-- Using the temp engine
+            label = f"{display_value} ({pct:+.1f}%)"
             options.append(label)
         
         selected = st.sidebar.radio("Select what to analyze:", options, index=0)
         selected_type = type_mapping[selected.split(" (")[0]]
         st.session_state.analysis_type = selected_type
         return selected_type
+    
 
     def _get_household_data(self, df_filtered: pd.DataFrame, household_id: int) -> pd.Series:
         """
