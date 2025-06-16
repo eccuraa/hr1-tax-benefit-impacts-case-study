@@ -67,7 +67,8 @@ class AppConfig:
 
 class UIConfig:
     """UI styling and configuration constants."""
-    CONTAINER_STYLE = "padding: 10px; border-radius: 5px; background-color: #f0f2f6;"
+    # Use transparent background with subtle backdrop
+    CONTAINER_STYLE = "padding: 10px; border-radius: 5px; background-color: rgba(128, 128, 128, 0.1); backdrop-filter: brightness(0.95);"
 
 @dataclass
 class FilterConfig:
@@ -743,11 +744,21 @@ class VisualizationRenderer:
         except Exception as e:
             logger.error(f"Error creating waterfall chart: {str(e)}")
             st.error("Error creating waterfall chart. Please try a different household.")
-    
+
     def _create_waterfall_figure(self, waterfall_data: List[Tuple], chart_title: str, 
-                                baseline_value: float, final_value: float) -> go.Figure:
+                            baseline_value: float, final_value: float) -> go.Figure:
         """Create Plotly waterfall figure."""
         fig = go.Figure()
+        
+        # Determine colors based on analysis type, sorry for the redundancy! It was simplest like this.
+        if self.analysis_engine.analysis_type == AnalysisType.NET_INCOME:
+            # For net income: increases are good (green), decreases are bad (red)
+            increasing_color = "green"
+            decreasing_color = "red"
+        else:
+            # For taxes: increases are bad (red), decreases are good (green)
+            increasing_color = "red"
+            decreasing_color = "green"
         
         fig.add_trace(go.Waterfall(
             name=f"{chart_title} Impact",
@@ -758,8 +769,8 @@ class VisualizationRenderer:
             text=[f"${item[1]:,.0f}" for item in waterfall_data],
             textposition="outside",
             connector={"line": {"color": "rgb(63, 63, 63)"}},
-            increasing={"marker": {"color": "red"}},
-            decreasing={"marker": {"color": "green"}},
+            increasing={"marker": {"color": increasing_color}},
+            decreasing={"marker": {"color": decreasing_color}},
             totals={"marker": {"color": "blue"}}
         ))
         
