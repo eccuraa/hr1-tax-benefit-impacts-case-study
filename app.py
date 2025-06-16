@@ -597,7 +597,7 @@ class VisualizationRenderer:
                 income_list.append(f"• {display_name}: ${amount:,.0f}")
         
         if income_list:
-            content = "<p><strong>Income Sources:</strong></p>"
+            content = "<p><strong>Featured Income Sources:</strong></p>"
             content += "".join(f"<p style='margin-left: 10px; margin-top: 2px;'>{income}</p>" 
                              for income in income_list)
             return content
@@ -792,9 +792,15 @@ class VisualizationRenderer:
             AnalysisType.STATE_TAXES: "State Taxes"
         }
         analysis_focus = focus_mapping[self.analysis_engine.analysis_type]
+
+        income_sources = AppConfig.INCOME_SOURCES
+        income_names = [display_name for display_name, _ in income_sources]
+        income_list = ", ".join(income_names[:-1]) + f", and {income_names[-1]}"
         
         st.info(f"""
-        📋 **Analysis Scope:** We are currently analyzing the effects of {reforms_text} on {analysis_focus}.
+        📋 **Analysis Scope:** We are currently analyzing the effects of {reforms_text} on {analysis_focus}. \n
+        Currently, we are only displaying the {income_list} as featured income sources, with Employment Income including Tip and Overtime Income. 
+        This is why these selected income sources will often not add up to the Gross Income total.
         """)
 
 
