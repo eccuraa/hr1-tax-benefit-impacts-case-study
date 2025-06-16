@@ -909,34 +909,34 @@ class HouseholdDashboard:
         st.title("HR1 Tax Bill - Household Impact Dashboard")
         st.markdown("*Explore how the HR1 tax bill affects individual American households compared to current policy*")
         st.sidebar.header("Select Household")
-    
+
+
     def _render_analysis_type_selector(self) -> AnalysisType:
-        """
-        Render analysis type selector in sidebar.
-        
-        Returns:
-            AnalysisType: Selected analysis type
-        """
+        """Render analysis type selector in sidebar with percent changes."""
         st.sidebar.markdown("---")
         st.sidebar.subheader("Analysis Type")
         
-        analysis_type = st.sidebar.radio(
-            "Select what to analyze:",
-            [AnalysisType.FEDERAL_TAXES.value, AnalysisType.STATE_TAXES.value, AnalysisType.NET_INCOME.value],
-            index=0
-        )
+        type_mapping = {analysis_type.value: analysis_type for analysis_type in AnalysisType}
         
-        # Map string values back to enum
-        type_mapping = {
-            AnalysisType.FEDERAL_TAXES.value: AnalysisType.FEDERAL_TAXES,
-            AnalysisType.STATE_TAXES.value: AnalysisType.STATE_TAXES,
-            AnalysisType.NET_INCOME.value: AnalysisType.NET_INCOME
-        }
+        options = []
+        for display_value, enum_type in type_mapping.items():
+            label = display_value
+            if hasattr(self, 'household_data') and self.household_data is not None:
+                try:
+                    current = getattr(self, 'analysis_type', None)
+                    self.analysis_type = enum_type
+                    _, pct, *_ = self.analysis_engine.get_change_info(self.household_data)
+                    if current: self.analysis_type = current
+                    label = f"{display_value} ({pct:+.1f}%)"
+                except:
+                    pass
+            options.append(label)
         
-        selected_type = type_mapping[analysis_type]
+        selected = st.sidebar.radio("Select what to analyze:", options, index=0)
+        selected_type = type_mapping[selected.split(" (")[0]]
         st.session_state.analysis_type = selected_type
         return selected_type
-    
+
     def _get_household_data(self, df_filtered: pd.DataFrame, household_id: int) -> pd.Series:
         """
         Get household data series for the selected household ID.
